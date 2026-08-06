@@ -1,4 +1,5 @@
 #ifndef MSMP0L1306_SYSTICK_H
+#define MSPM0L1306_SYSTICK_H
 
 #include <stdint.h>
 
@@ -6,8 +7,8 @@
 #define __O   volatile         // Defines 'write only'  permission
 #define __IO  volatile         // Defines 'read / write only'  permission
 #define __IM  volatile const   // Defines 'read only' structure member  permission
-#define __OM  volatile const   // Defines 'write only'  structure member permission
-#define __IOM volatile const   // Defines 'read / write only'  structure member permission
+#define __OM  volatile         // Defines 'write only'  structure member permission
+#define __IOM volatile         // Defines 'read / write only'  structure member permission
 
 // Structure Type to acces System Timer (SysTick)
 
@@ -62,9 +63,9 @@ typedef struct
 #define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address */
 #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Base Address */
 
-#define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
+//#define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
-#define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
+//#define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
 
 
 
