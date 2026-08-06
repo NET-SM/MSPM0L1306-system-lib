@@ -1,0 +1,14 @@
+#Build output
+build/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+
+#Editor/IDE specific
+.vscode/
+*.swp
+*~
+
