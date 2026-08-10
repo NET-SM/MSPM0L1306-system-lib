@@ -2,6 +2,9 @@
 #define MSPM0L1306_SYSTICK_H
 
 #include <stdint.h>
+#include "mspm0_reg_utils.h"
+
+extern uint32_t SystemCoreClock;
 
 #define __I   volatile const   // Defines 'read only'  permission
 #define __O   volatile         // Defines 'write only'  permission
@@ -64,7 +67,7 @@ typedef struct
 #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Base Address */
 
 //#define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
-#define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
+#define SysTick               ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
 //#define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
 
 
@@ -81,7 +84,7 @@ static inline uint32_t SysTick_Config(uint32_t ticks){
     SysTick->LOAD = (uint32_t)(ticks - 1UL);   //Set Reload Register
     //NVIC_SetPriority (SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
 
-    SysTick->VAL   = 0UL;                                               /* Load the SysTick Counter Value */
+    SysTick->VAL   = 0UL;                                                /* Load the SysTick Counter Value */
     SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
                    SysTick_CTRL_TICKINT_Msk   |
                    SysTick_CTRL_ENABLE_Msk;                             /* Enable SysTick IRQ and SysTick Timer */
@@ -90,6 +93,28 @@ static inline uint32_t SysTick_Config(uint32_t ticks){
 }
 
 
+
+static inline void delay_ms(uint32_t ms){
+
+    SysTick->LOAD = (SystemCoreClock / 1000) - 1; // Brojac broji load + 1 jer ubraja 0, onda da bi bilo tacno ticks, treba da bude ticks - 1
+    SysTick->VAL = 0;
+
+    // Setuje CLK SRC na CPU CLK 
+    REG_SET_BITS(&SysTick->CTRL, SysTick_CTRL_CLKSOURCE_Msk);
+    // Enabeles counter
+    REG_SET_BITS(&SysTick->CTRL, SysTick_CTRL_ENABLE_Msk);
+    
+    for (uint32_t i = 0; i < ms; i++){
+        while (REG_READ_FIELD(&SysTick->CTRL, SysTick_CTRL_COUNTFLAG_Msk) == 0){
+            // wait
+        }
+        
+    }
+
+    // Disabling counter
+    REG_CLEAR_BITS(&SysTick->CTRL, SysTick_CTRL_ENABLE_Msk);
+
+}
 
 
 #endif // MSMP0L1306_SYSTICK_H

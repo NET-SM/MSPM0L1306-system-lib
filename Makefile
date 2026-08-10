@@ -15,8 +15,12 @@ CFLAGS =  \
 	-Icore
 
 LDFLAGS =  \
+	-mcpu=cortex-m0plus \
+	-mthumb \
 	-T $(LINKER_DIR)/mspm0l1306.ld \
 	-nostdlib
+
+LDLIBS = -lgcc
 
 # Svi izvorni fajlovi
 SRCS_ROOT = startup.c main.c
@@ -36,7 +40,7 @@ $(BUILD_DIR):
 
 # Linkovanje
 $(BUILD_DIR)/$(TARGET).elf: $(OBJS) | $(BUILD_DIR)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 # Kompajliranje (fajlovi u root folderu)
 $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)

@@ -3,6 +3,7 @@
 uint32_t SystemCoreClock;
 
 void ClockInit(SystemClock_t clock);
+void SystemInit(SystemClock_t clock);
 
 void SystemInit(SystemClock_t clock)
 {
@@ -15,6 +16,8 @@ void SystemInit(SystemClock_t clock)
 
     ClockInit(clock);
     SystemCoreClock = (uint32_t)clock * 1000000;
+
+    
 }
 
 void ClockInit(SystemClock_t clock){
@@ -37,9 +40,6 @@ void ClockInit(SystemClock_t clock){
     case CLOCK_32MHZ:
         freq_value = 0x0;
         break;
-    case CLOCK_48MHZ:
-        freq_value = 0x3;
-        break;
     default:
         break;
     }
@@ -52,11 +52,3 @@ void ClockInit(SystemClock_t clock){
     while ((SYSCTL->SOCLOCK.CLKSTATUS & 0x3) != freq_value) { }  
 
 }
-
-void Flash_Init(){
-
-};
-
-void Power_Init(){
-
-};

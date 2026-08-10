@@ -19,17 +19,15 @@ static inline void REG_WRITE_FIELD(volatile uint32_t *reg, uint32_t mask, uint32
 } // clear+set u jednom pozivu (ono što si ručno radio za SYSOSCCFG.FREQ)
 static inline uint32_t REG_READ_FIELD(volatile uint32_t *reg, uint32_t mask){
 
-    uint32_t read_bit;
-    uint32_t shift;
+    uint32_t read_bit = (*reg & mask);
+    uint32_t shift = 0;
     while ((mask & 1) == 0){
-        mask >> 1;
+        mask >>= 1;
         shift++;
     }
-    read_bit = (*reg & mask) >> shift;
+    
 
-    return read_bit; 
+    return (read_bit >> shift); 
 }
-
-
 
 #endif // MSPM0_REG_UTILS_H

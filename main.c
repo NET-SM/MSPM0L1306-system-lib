@@ -19,8 +19,6 @@ int main(void)
     while (1) {
         
         GPIOA->DOUTTGL31_0 = LED2_PIN;
-        // GPIOA->DOUT31_0 ^= LED2_PIN;
-        for(volatile int i = 0; i < 500000; i++);
-
+        delay_ms(1000);
     }
 }
