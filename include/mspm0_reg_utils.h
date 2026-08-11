@@ -11,9 +11,11 @@ static inline void REG_CLEAR_BITS(volatile uint32_t *reg, uint32_t mask){
     *reg &= ~mask;
 
 } // AND NOT
-static inline void REG_WRITE_FIELD(volatile uint32_t *reg, uint32_t mask, uint32_t value){
+
+static inline void REG_WRITE_FIELD(volatile uint32_t *reg, uint32_t mask, uint32_t value, uint32_t offset){
 
     REG_CLEAR_BITS(reg, mask);
+    value <<= offset;
     *reg |= value;
 
 } // clear+set u jednom pozivu (ono što si ručno radio za SYSOSCCFG.FREQ)

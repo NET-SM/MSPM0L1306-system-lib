@@ -84,7 +84,6 @@ typedef struct {
 #define SYSCTL_SYSOSCCFG_FREQ_SYSOSCBASE    (0x00000000U)  // 32 MHz
 #define SYSCTL_SYSOSCCFG_FREQ_SYSOSC4M      (0x00000001U)  // 4 MHz
 #define SYSCTL_SYSOSCCFG_FREQ_SYSOSCUSER    (0x00000002U)  // 16/24 MHz
-#define SYSCTL_SYSOSCCFG_FREQ_SYSOSCTURBO   (0x00000003U)  // 48 MHz  TODO NE ZNAM DA LI ovo MSPM0L1306 moze neki MSPM0 to mogu 
 
 // ============================================================================
 // SYSCTL MCLKCFG registar (0x400AF004)
@@ -100,5 +99,109 @@ typedef struct {
 // ============================================================================
 
 #define SYSCTL_CLKSTATUS_SYSOSCFREQ_MASK    (0x00000003U) 
+
+// ============================================================================
+// SYSCTL SYSOSCTRIMUSER registar (offset 0x1170) 
+// ============================================================================
+
+#define SYSCTL_SYSOSCTRIMUSER_FREQ_OFS            (0)
+#define SYSCTL_SYSOSCTRIMUSER_FREQ_MASK           (0x00000003U)
+
+#define SYSCTL_SYSOSCTRIMUSER_FREQ_SYSOSC16M      (0x00000001U)
+#define SYSCTL_SYSOSCTRIMUSER_FREQ_SYSOSC24M      (0x00000002U)
+
+#define SYSCTL_SYSOSCTRIMUSER_CAP_OFS             (4)
+#define SYSCTL_SYSOSCTRIMUSER_CAP_MASK            (0x00000070U)
+
+#define SYSCTL_SYSOSCTRIMUSER_RESCOARSE_OFS       (8)
+#define SYSCTL_SYSOSCTRIMUSER_RESCOARSE_MASK      (0x00003F00U)
+
+#define SYSCTL_SYSOSCTRIMUSER_RESFINE_OFS         (16)
+#define SYSCTL_SYSOSCTRIMUSER_RESFINE_MASK        (0x000F0000U)
+
+#define SYSCTL_SYSOSCTRIMUSER_RDIV_OFS            (20)
+#define SYSCTL_SYSOSCTRIMUSER_RDIV_MASK           (0x1FF00000U)
+
+// ============================================================================
+// SYSCTL GENCLKCFG registar (offset 0x1138) 
+// ============================================================================
+
+#define SYSCTL_GENCLKCFG_FCCTRIGCNT_OFS           (24)
+#define SYSCTL_GENCLKCFG_FCCTRIGCNT_MASK          (0x1F000000U)
+
+
+#define SYSCTL_GENCLKCFG_ANACPUMPCCFG_OFS         (22)
+#define SYSCTL_GENCLKCFG_ANACPUMPCCFG_MASK        (0x00C00000U)
+
+#define SYSCTL_GENCLKCFG_ANACPUMPCCFG_ONDEMAND    (0x00000000U)
+#define SYSCTL_GENCLKCFG_ANACPUMPCCFG_ONACTIVE    (0x00400000U)
+#define SYSCTL_GENCLKCFG_ANACPUMPCCFG_ONALWAYS    (0x00800000U)
+
+
+#define SYSCTL_GENCLKCFG_FCCLVLTRIG_OFS           (21)
+#define SYSCTL_GENCLKCFG_FCCLVLTRIG_MASK          (0x00200000U)
+
+#define SYSCTL_GENCLKCFG_FCCLVLTRIG_RISE2RISE     (0x00000000U)
+#define SYSCTL_GENCLKCFG_FCCLVLTRIG_LEVEL         (0x00200000U) 
+
+
+#define SYSCTL_GENCLKCFG_FCCTRIGSRC_OFS           (20)
+#define SYSCTL_GENCLKCFG_FCCTRIGSRC_MASK          (0x00100000U)
+
+#define SYSCTL_GENCLKCFG_FCCTRIGSRC_EXTPIN        (0x00000000U)         
+#define SYSCTL_GENCLKCFG_FCCTRIGSRC_LFCLK         (0x00100000U)         
+
+
+#define SYSCTL_GENCLKCFG_FCCSELCLK_OFS            (16)
+#define SYSCTL_GENCLKCFG_FCCSELCLK_MASK           (0x000F0000U)
+
+#define SYSCTL_GENCLKCFG_FCCSELCLK_MCLK           (0x00000000U)            
+#define SYSCTL_GENCLKCFG_FCCSELCLK_SYSOSC         (0x00010000U)            
+#define SYSCTL_GENCLKCFG_FCCSELCLK_EXTCLK         (0x00030000U)        
+#define SYSCTL_GENCLKCFG_FCCSELCLK_FCCIN          (0x00070000U)
+
+#define SYSCTL_GENCLKCFG_EXCLKDIVEN_OFS           (7)
+#define SYSCTL_GENCLKCFG_EXCLKDIVEN_MASK          (0x00000080U)
+
+#define SYSCTL_GENCLKCFG_EXCLKDIVEN_PASSTHRU      (0x00000000U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVEN_ENABLE        (0x00000080U)
+
+
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_OFS          (4)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_MASK         (0x00000070U)
+
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV2         (0x00000000U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV4         (0x00000010U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV6         (0x00000020U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV8         (0x00000030U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV10        (0x00000040U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV12        (0x00000050U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV14        (0x00000060U)
+#define SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV16        (0x00000070U)
+
+
+#define SYSCTL_GENCLKCFG_EXCLKSRC_OFS             (0)
+#define SYSCTL_GENCLKCFG_EXCLKSRC_MASK            (0x00000007U)
+
+#define SYSCTL_GENCLKCFG_EXCLKSRC_SYSOSC          (0x00000000U)
+#define SYSCTL_GENCLKCFG_EXCLKSRC_UPCLK           (0x00000001U)
+#define SYSCTL_GENCLKCFG_EXCLKSRC_LFCLK           (0x00000002U)
+#define SYSCTL_GENCLKCFG_EXCLKSRC_MFPCLK          (0x00000003U)
+
+// ============================================================================
+// SYSCTL GENCLKEN registar (offset 0x113C) 
+// ============================================================================
+
+#define SYSCTL_GENCLKEN_MFPCLKEN_OFS              (4)
+#define SYSCTL_GENCLKEN_MFPCLKEN_MASK             (0x00000010U)
+
+#define SYSCTL_GENCLKEN_MFPCLKEN_DISABLE          (0x00000000U)
+#define SYSCTL_GENCLKEN_MFPCLKEN_ENABLE           (0x00000010U)
+
+#define SYSCTL_GENCLKEN_EXCLKEN_OFS               (0)
+#define SYSCTL_GENCLKEN_EXCLKEN_MASK              (0x00000001U)
+
+#define SYSCTL_GENCLKEN_EXCLKEN_DISABLE           (0x00000000U)
+#define SYSCTL_GENCLKEN_EXCLKEN_ENABLE            (0x00000001U)
 
 #endif // MSPM0L1306_SYSCTL_H

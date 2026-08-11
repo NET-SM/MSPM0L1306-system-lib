@@ -4,6 +4,9 @@ uint32_t SystemCoreClock;
 
 void ClockInit(SystemClock_t clock);
 void SystemInit(SystemClock_t clock);
+void CLK_OUT_SETUP();
+void Trim_Function(uint32_t rescoarse, uint32_t resfine, uint32_t cap, uint32_t freq_sel);
+void SystemCoreClockUpdate();
 
 void SystemInit(SystemClock_t clock)
 {
@@ -15,40 +18,166 @@ void SystemInit(SystemClock_t clock)
     // Konfigurisanje SYSOSC frekv.
 
     ClockInit(clock);
-    SystemCoreClock = (uint32_t)clock * 1000000;
+    SystemCoreClockUpdate(); 
+    
 
     
 }
 
 void ClockInit(SystemClock_t clock){
 
-    // Nema potrebe za proverom jer je enumerisano
-
     uint32_t freq_value;
-    
+    uint32_t user_trim_freq_value;
+
     switch (clock)
     {
     case CLOCK_4MHZ:
         freq_value = 0x1;
+        user_trim_freq_value = 0x0;
         break;
     case CLOCK_16MHZ:
-        // TODO
+        freq_value = 0x2;
+        user_trim_freq_value = 0x1;
         break;
     case CLOCK_24MHZ:
-        // TODO
+        freq_value = 0x2;
+        user_trim_freq_value = 0x2;
         break;
     case CLOCK_32MHZ:
         freq_value = 0x0;
+        user_trim_freq_value = 0x0;
         break;
     default:
         break;
     }
 
+    if(freq_value == 0x2){
 
-    // Clearujemo preostale bite i stavljamo nove
-    SYSCTL->SOCLOCK.SYSOSCCFG = (SYSCTL->SOCLOCK.SYSOSCCFG & ~0x3) | freq_value; 
-    
+        switch(user_trim_freq_value){
+
+            case 0x1: // 16MHz
+            //CLK_OUT_SETUP();
+            Trim_Function(20, 8, 1, SYSCTL_SYSOSCTRIMUSER_FREQ_SYSOSC16M);
+            break;
+            case 0x2:
+            Trim_Function(32, 8, 0, SYSCTL_SYSOSCTRIMUSER_FREQ_SYSOSC24M); 
+            break;
+        }
+
+
+    }
+    else{
+
+        // Clearujemo preostale bite i stavljamo nove
+        SYSCTL->SOCLOCK.SYSOSCCFG = (SYSCTL->SOCLOCK.SYSOSCCFG & ~0x3) | freq_value; 
+ 
+    }
+
     // Wait for sync
-    while ((SYSCTL->SOCLOCK.CLKSTATUS & 0x3) != freq_value) { }  
+    while ((SYSCTL->SOCLOCK.CLKSTATUS & 0x3) != freq_value) { } 
+
+}
+
+void CLK_OUT_SETUP(){
+
+    // 1. Configure IOMUX to select the CLK_OUT function on the device pin with CLK_OUT
+    // Ovo bi trbalo da enabluje CLK_OUT na PA7
+    IOMUX->SECCFG.PINCM[IOMUX_PINCM8] = IOMUX_PINCM_PC_CONNECTED | IOMUX_PINCM8_PF_SYSCTL_CLK_OUT;
+
+    // 2. Select the desired clock source in the EXCLKSRC field of the GENCLKCFG register.
+    SYSCTL->SOCLOCK.GENCLKCFG = (SYSCTL->SOCLOCK.GENCLKCFG &~ SYSCTL_GENCLKCFG_EXCLKSRC_MASK) | SYSCTL_GENCLKCFG_EXCLKSRC_SYSOSC;
+
+    // 3. Set the desired clock divider, if necessary, in the EXCLKDIVVAL field of the GENCLKCFG register, and
+    // enable the divider by setting the EXCLKDIVEN bit. This must be done while EXCLKEN=0 (before CLK_OUT
+    // is enabled)
+
+    // SA DELITELJEM
+    SYSCTL->SOCLOCK.GENCLKCFG = (SYSCTL->SOCLOCK.GENCLKCFG &~ 
+                                 SYSCTL_GENCLKCFG_EXCLKDIVEN_MASK) |
+                                 SYSCTL_GENCLKCFG_EXCLKDIVEN_ENABLE;
+
+    SYSCTL->SOCLOCK.GENCLKCFG = (SYSCTL->SOCLOCK.GENCLKCFG &~ 
+                                 SYSCTL_GENCLKCFG_EXCLKDIVVAL_MASK) |
+                                 SYSCTL_GENCLKCFG_EXCLKDIVVAL_DIV16;
+    
+
+    // 4. Enable the external clock output by setting the EXCLKEN bit in the GENCLKEN register.
+
+    SYSCTL->SOCLOCK.GENCLKEN = (SYSCTL->SOCLOCK.GENCLKEN &~ 
+                                SYSCTL_GENCLKEN_EXCLKEN_MASK) | 
+                                SYSCTL_GENCLKEN_EXCLKEN_ENABLE;
+
+}
+
+void Trim_Function(uint32_t rescoarse, uint32_t resfine, uint32_t cap, uint32_t freq_sel){
+
+    // 1. Set the SYSOSC frequency to BASE to start and leave the FCL mode disabled
+
+    SYSCTL->SOCLOCK.SYSOSCCFG = (SYSCTL->SOCLOCK.SYSOSCCFG &~ SYSCTL_SYSOSCCFG_FREQ_MASK) | SYSCTL_SYSOSCCFG_FREQ_SYSOSCBASE;
+    
+    // 2. Program an initial tuning for the target frequency in the SYSOSCTRIMUSER register:
+    // a. Set the RESCOARSE trim field in the SYSOSCTRIMUSER register to mid-range
+    // b. Set the RESFINE trim field in the SYSOSCTRIMUSER register to mid-range
+
+    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
+                    SYSCTL_SYSOSCTRIMUSER_RESCOARSE_MASK,         
+                    rescoarse,  
+                     SYSCTL_SYSOSCTRIMUSER_RESCOARSE_OFS);
+
+    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER, 
+                    SYSCTL_SYSOSCTRIMUSER_RESFINE_MASK, 
+                    resfine, 
+                    SYSCTL_SYSOSCTRIMUSER_RESFINE_OFS);
+
+    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER, 
+                    SYSCTL_SYSOSCTRIMUSER_CAP_MASK, 
+                    cap, 
+                    SYSCTL_SYSOSCTRIMUSER_CAP_OFS);
+
+    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER, 
+                    SYSCTL_SYSOSCTRIMUSER_FREQ_MASK,  
+                    freq_sel, 
+                    SYSCTL_SYSOSCTRIMUSER_FREQ_OFS);
+           
+    // 3. Switch SYSOSC to the user-trimmed frequency by selecting USER in the FREQ field of the SYSOSCCFG register
+    
+    SYSCTL->SOCLOCK.SYSOSCCFG = (SYSCTL->SOCLOCK.SYSOSCCFG &~ SYSCTL_SYSOSCCFG_FREQ_MASK) | 
+                                 SYSCTL_SYSOSCCFG_FREQ_SYSOSCUSER;
+
+}
+
+void SystemCoreClockUpdate(){
+
+    uint32_t current_freq = SYSCTL->SOCLOCK.CLKSTATUS & 
+                            SYSCTL_CLKSTATUS_SYSOSCFREQ_MASK;
+    
+    
+    uint32_t ut_current_freq = SYSCTL->SOCLOCK.SYSOSCTRIMUSER & 
+                               SYSCTL_SYSOSCTRIMUSER_FREQ_MASK;
+
+    switch (current_freq){
+    case 0x0:
+        
+        SystemCoreClock = 32000000;
+        
+        break;
+    case 0x1:
+    
+        SystemCoreClock = 4000000;
+    
+        break;
+    case 0x2:
+
+        if (ut_current_freq == 0x1) SystemCoreClock = 16000000;
+        if (ut_current_freq == 0x2) SystemCoreClock = 24000000;
+    
+        break;
+    default:
+
+        SystemCoreClock = 0; // Error
+        
+        break;
+    }
+
 
 }
