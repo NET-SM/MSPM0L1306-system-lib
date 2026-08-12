@@ -61,14 +61,14 @@ typedef struct
 
 
 // Memory mapping of core hardware
-#define SCS_BASE            (0xE000E000UL)                            /*!< System Control Space Base Address */
-#define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address */
-#define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address */
-#define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Base Address */
+#define SCS_BASE            (0xE000E000UL)                              /*!< System Control Space Base Address */
+#define SysTick_BASE        (SCS_BASE +  0x0010UL)                      /*!< SysTick Base Address */
+#define NVIC_BASE           (SCS_BASE +  0x0100UL)                      /*!< NVIC Base Address */
+#define SCB_BASE            (SCS_BASE +  0x0D00UL)                      /*!< System Control Block Base Address */
 
 //#define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
 #define SysTick               ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
-//#define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
+#define NVIC                  ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
 
 
 
@@ -82,13 +82,13 @@ static inline uint32_t SysTick_Config(uint32_t ticks){
     }
     
     SysTick->LOAD = (uint32_t)(ticks - 1UL);   //Set Reload Register
-    //NVIC_SetPriority (SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
+    //NVIC_SetPriority (SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL);  /* set Priority for Systick Interrupt */
 
     SysTick->VAL   = 0UL;                                                /* Load the SysTick Counter Value */
     SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
                    SysTick_CTRL_TICKINT_Msk   |
-                   SysTick_CTRL_ENABLE_Msk;                             /* Enable SysTick IRQ and SysTick Timer */
-    return (0UL);                                                       /* Function successful */
+                   SysTick_CTRL_ENABLE_Msk;                              /* Enable SysTick IRQ and SysTick Timer */
+    return (0UL);                                                        /* Function successful */
 
 }
 
@@ -105,15 +105,15 @@ static inline void delay_ms(uint32_t ms){
     REG_SET_BITS(&SysTick->CTRL, SysTick_CTRL_ENABLE_Msk);
     
     for (uint32_t i = 0; i < ms; i++){
-        while (REG_READ_FIELD(&SysTick->CTRL, SysTick_CTRL_COUNTFLAG_Msk) == 0){
+        
+        while(read_reg_bit(&SysTick->CTRL, SysTick_CTRL_COUNTFLAG_Pos) == 0){
             // wait
-        }
+        } 
         
     }
 
     // Disabling counter
-    REG_CLEAR_BITS(&SysTick->CTRL, SysTick_CTRL_ENABLE_Msk);
-
+    clear_reg_bit(&SysTick->CTRL, SysTick_CTRL_ENABLE_Pos);
 }
 
 

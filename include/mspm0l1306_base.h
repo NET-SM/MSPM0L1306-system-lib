@@ -7,9 +7,12 @@
 // CMSIS-style access qualifiers
 // ============================================================================
 
-#define __IO volatile
-#define __I  volatile const
-#define __O  volatile
+#define __IO volatile           /* read-write */
+#define __I  volatile const     /* read-only  */
+#define __O  volatile           /* write-only */
+
+#define ENABLE 1U
+#define DISABLE 0U
 
 // ============================================================================
 // Base adrese svih perifernih modula (MSPM0L1306)

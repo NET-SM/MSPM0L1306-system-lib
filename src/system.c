@@ -119,26 +119,22 @@ void Trim_Function(uint32_t rescoarse, uint32_t resfine, uint32_t cap, uint32_t 
     // a. Set the RESCOARSE trim field in the SYSOSCTRIMUSER register to mid-range
     // b. Set the RESFINE trim field in the SYSOSCTRIMUSER register to mid-range
 
-    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
-                    SYSCTL_SYSOSCTRIMUSER_RESCOARSE_MASK,         
-                    rescoarse,  
-                     SYSCTL_SYSOSCTRIMUSER_RESCOARSE_OFS);
-
-    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER, 
-                    SYSCTL_SYSOSCTRIMUSER_RESFINE_MASK, 
-                    resfine, 
-                    SYSCTL_SYSOSCTRIMUSER_RESFINE_OFS);
-
-    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER, 
-                    SYSCTL_SYSOSCTRIMUSER_CAP_MASK, 
-                    cap, 
-                    SYSCTL_SYSOSCTRIMUSER_CAP_OFS);
-
-    REG_WRITE_FIELD(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER, 
-                    SYSCTL_SYSOSCTRIMUSER_FREQ_MASK,  
-                    freq_sel, 
-                    SYSCTL_SYSOSCTRIMUSER_FREQ_OFS);
-           
+    write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
+                    SYSCTL_SYSOSCTRIMUSER_RESCOARSE_OFS,
+                    6, rescoarse);
+    
+    write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
+                    SYSCTL_SYSOSCTRIMUSER_RESFINE_OFS,
+                    4, resfine);
+    
+    write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
+                    SYSCTL_SYSOSCTRIMUSER_CAP_OFS,
+                    3, cap);
+    
+    write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
+                    SYSCTL_SYSOSCTRIMUSER_FREQ_OFS,
+                    2, freq_sel);
+   
     // 3. Switch SYSOSC to the user-trimmed frequency by selecting USER in the FREQ field of the SYSOSCCFG register
     
     SYSCTL->SOCLOCK.SYSOSCCFG = (SYSCTL->SOCLOCK.SYSOSCCFG &~ SYSCTL_SYSOSCCFG_FREQ_MASK) | 
