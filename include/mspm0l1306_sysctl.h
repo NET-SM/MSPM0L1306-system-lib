@@ -1,4 +1,5 @@
 #ifndef MSPM0L1306_SYSCTL_H
+#define MSPM0L1306_SYSCTL_H
 
 #include "mspm0l1306_base.h"
 

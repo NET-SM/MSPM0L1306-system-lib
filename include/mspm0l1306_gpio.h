@@ -190,5 +190,10 @@ void     gpio_clear_interrupt        (uint32_t pin);
 void     gpio_enable_power           (void);
 uint32_t gpio_get_interrupt_status   (uint32_t pin);
 
+uint32_t gpio_read                   (uint32_t pin);
+void     gpio_write                  (uint32_t pin, uint32_t value);
+void     gpio_enable_output          (uint32_t pin);
+void     gpio_enable_input           (uint32_t pin);
+
 
 #endif // MSPM0L1306_GPIO_H

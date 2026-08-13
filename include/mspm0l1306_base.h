@@ -11,7 +11,7 @@
 #define __I  volatile const     /* read-only  */
 #define __O  volatile           /* write-only */
 
-#define ENABLE 1U
+#define ENABLE  1U
 #define DISABLE 0U
 
 // ============================================================================

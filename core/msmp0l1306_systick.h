@@ -13,6 +13,9 @@ extern uint32_t SystemCoreClock;
 #define __OM  volatile         // Defines 'write only'  structure member permission
 #define __IOM volatile         // Defines 'read / write only'  structure member permission
 
+#define ENABLE  1U
+#define DISABLE 0U
+
 // Structure Type to acces System Timer (SysTick)
 
 typedef struct
@@ -100,9 +103,10 @@ static inline void delay_ms(uint32_t ms){
     SysTick->VAL = 0;
 
     // Setuje CLK SRC na CPU CLK 
-    REG_SET_BITS(&SysTick->CTRL, SysTick_CTRL_CLKSOURCE_Msk);
+    write_reg_bit(&SysTick->CTRL, SysTick_CTRL_CLKSOURCE_Pos, ENABLE);
+    
     // Enabeles counter
-    REG_SET_BITS(&SysTick->CTRL, SysTick_CTRL_ENABLE_Msk);
+    write_reg_bit(&SysTick->CTRL, SysTick_CTRL_ENABLE_Pos, ENABLE);
     
     for (uint32_t i = 0; i < ms; i++){
         

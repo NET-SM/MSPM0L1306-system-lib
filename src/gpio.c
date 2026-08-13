@@ -20,15 +20,13 @@ void gpio_configure_interrupt(uint32_t pin, uint32_t edge)
     }else{
 
         uint32_t shift =  (pin - 16) * 2;
-        GPIOA->POLARITY15_0 = (GPIOA->POLARITY15_0 &~ (0x3U << shift)) | (edge << shift);
+        GPIOA->POLARITY31_16 = (GPIOA->POLARITY31_16 &~ (0x3U << shift)) | (edge << shift);
 
     }
 
 }
 
 void gpio_enable_interrupt(uint32_t pin){
-
-    uint32_t shifted_pin = 1U << pin;
     
     write_reg_bit(&GPIOA->CPU_INT.IMASK, pin, ENABLE);   
 }
@@ -49,3 +47,41 @@ uint32_t gpio_get_interrupt_status(uint32_t pin)
 
     return status;
 }
+
+// Configuration ( used during init phase of a GPIO )
+
+void gpio_enable_output(uint32_t pin){
+    
+    write_reg_bit(&GPIOA->DOE31_0, pin, ENABLE);
+
+}
+
+void gpio_enable_input(uint32_t pin){
+
+    write_reg_bit(&GPIOA->DOE31_0, pin, DISABLE);
+
+}
+
+// RW Funcs.
+
+void gpio_write(uint32_t pin, uint32_t value){
+
+    if(value){
+    
+        GPIOA->DOUTSET31_0 = (1U << pin);
+    
+    } else {
+
+        GPIOA->DOUTCLR31_0 = (1U << pin);
+
+    }
+
+}  // DOUTSET/DOUTCLR na osnovu value
+
+
+uint32_t gpio_read(uint32_t pin){
+
+    uint32_t read_value = read_reg_bit(&GPIOA->DIN31_0, pin);
+    return read_value;
+
+}               // DIN31_0, izvuci bit

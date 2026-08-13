@@ -16,7 +16,7 @@ static inline void clear_reg_bit(volatile uint32_t *reg, uint32_t pos){
 
 }
 
-static inline uint32_t read_reg_bit(volatile uint32_t *reg, uint32_t pos){
+static inline uint32_t read_reg_bit(const volatile uint32_t *reg, uint32_t pos){
     
     uint32_t read_bit = 1U << pos;
     
@@ -44,7 +44,7 @@ static inline void clear_reg_field(volatile uint32_t *reg, uint32_t pos, uint32_
 
 }
 
-static inline uint32_t read_reg_field(volatile uint32_t *reg, uint32_t pos, uint32_t width){
+static inline uint32_t read_reg_field(const volatile uint32_t *reg, uint32_t pos, uint32_t width){
 
     uint32_t mask = ((1U << width) - 1U) << pos;
 
