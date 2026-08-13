@@ -15,6 +15,36 @@
 #define DISABLE 0U
 
 // ============================================================================
+// Interrupt Definitions 
+// ============================================================================
+
+typedef enum IRQn
+{
+  NonMaskableInt_IRQn         = -14,    /* 2  Non Maskable Interrupt */
+  HardFault_IRQn              = -13,    /* 3  Hard Fault Interrupt */
+  SVCall_IRQn                 = -5,     /* 11 SV Call Interrupt */
+  PendSV_IRQn                 = -2,     /* 14 Pend SV Interrupt */
+  SysTick_IRQn                = -1,     /* 15 System Tick Interrupt */
+  FLASHCTL_INT_IRQn           = 0,      /* 16 FLASHCTL_INT Interrupt */
+  WWDT0_INT_IRQn              = 0,      /* 16 WWDT0_INT Interrupt */
+  DEBUGSS_INT_IRQn            = 0,      /* 16 DEBUGSS_INT Interrupt */
+  SYSCTL_INT_IRQn             = 0,      /* 16 SYSCTL_INT Interrupt */
+  GPIOA_INT_IRQn              = 1,      /* 17 GPIOA_INT Interrupt */
+  COMP0_INT_IRQn              = 1,      /* 17 COMP0_INT Interrupt */
+  TIMG1_INT_IRQn              = 2,      /* 18 TIMG1_INT Interrupt */
+  ADC0_INT_IRQn               = 4,      /* 19 ADC0_INT Interrupt */
+  SPI0_INT_IRQn               = 9,      /* 25 SPI0_INT Interrupt */
+  UART1_INT_IRQn              = 13,     /* 29 UART1_INT Interrupt */
+  UART0_INT_IRQn              = 15,     /* 31 UART0_INT Interrupt */
+  TIMG0_INT_IRQn              = 16,     /* 32 TIMG0_INT Interrupt */
+  TIMG2_INT_IRQn              = 18,     /* 34 TIMG2_INT Interrupt */
+  TIMG4_INT_IRQn              = 20,     /* 36 TIMG4_INT Interrupt */
+  I2C0_INT_IRQn               = 24,     /* 40 I2C0_INT Interrupt */
+  I2C1_INT_IRQn               = 25,     /* 41 I2C1_INT Interrupt */
+  DMA_INT_IRQn                = 31,     /* 47 DMA_INT Interrupt */
+} IRQn_Type;
+
+// ============================================================================
 // Base adrese svih perifernih modula (MSPM0L1306)
 // ============================================================================
 

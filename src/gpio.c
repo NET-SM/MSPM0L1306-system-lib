@@ -35,12 +35,12 @@ void gpio_clear_interrupt(uint32_t pin)
 {
     uint32_t shifted_pin = 1U << pin;
 
-    GPIOA->CPU_INT.ICLR =  shifted_pin;
+    GPIOA->CPU_INT.ICLR = shifted_pin;
 }
 
 uint32_t gpio_get_interrupt_status(uint32_t pin)
 {
-    uint32_t status = 0U;
+    uint32_t status = 0U; 
     uint32_t shifted_pin = 1U << pin;
 
     if (GPIOA->CPU_INT.MIS & shifted_pin) status = 1U; 
@@ -76,7 +76,7 @@ void gpio_write(uint32_t pin, uint32_t value){
 
     }
 
-}  // DOUTSET/DOUTCLR na osnovu value
+}
 
 
 uint32_t gpio_read(uint32_t pin){
@@ -84,4 +84,27 @@ uint32_t gpio_read(uint32_t pin){
     uint32_t read_value = read_reg_bit(&GPIOA->DIN31_0, pin);
     return read_value;
 
-}               // DIN31_0, izvuci bit
+}
+
+void gpio_toggle(uint32_t pin){
+
+    GPIOA->DOUTTGL31_0 = (1U << pin);
+
+}
+
+static gpio_callback_t callbacks[32] = {0};
+
+void gpio_register_callback(uint32_t pin, gpio_callback_t callback){
+    
+    callbacks[pin] = callback;
+
+}
+
+void gpio_dispatch_interrupt(uint32_t pin){
+
+    if(callbacks[pin] != 0){
+        callbacks[pin](pin);
+    }
+
+    gpio_clear_interrupt(pin);
+}

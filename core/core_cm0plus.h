@@ -1,5 +1,5 @@
-#ifndef MSMP0L1306_SYSTICK_H
-#define MSPM0L1306_SYSTICK_H
+#ifndef CORE_CM0PLUS_H
+#define CORE_CM0PLUS_H
 
 #include <stdint.h>
 #include "mspm0_reg_utils.h"
@@ -16,7 +16,27 @@ extern uint32_t SystemCoreClock;
 #define ENABLE  1U
 #define DISABLE 0U
 
-// Structure Type to acces System Timer (SysTick)
+
+// Structure Type to access Nested Vectored Interrupt Controller (NVIC) 
+
+typedef struct{
+
+    __IOM uint32_t ISER[1U];            // Offset: 0x000 (R/W) Interrupt Set Enable Register
+          uint32_t RESERVED0[31U];
+    __IOM uint32_t ICER[1U];            // Offset: 0x080 (R/W) Interrupt Clear Enable Register
+          uint32_t RESERVED1[31U];
+    __IOM uint32_t ISPR[1U];            // Offset: 0x100 (R/W) Interrupt Set Pending Register
+          uint32_t RESERVED2[31U];
+    __IOM uint32_t ICPR[1U];            // Offset: 0x180 (R/W) Interrupt Clear Pending Register
+          uint32_t RESERVED3[31U];
+          uint32_t RESERVED4[64U];
+    __IOM uint32_t IP[8U];              // Offset: 0x300 (R/W) Interrupt Priority Register
+
+}NVIC_Type;
+
+
+
+// Structure Type to access System Timer (SysTick)
 
 typedef struct
 {
@@ -64,14 +84,29 @@ typedef struct
 
 
 // Memory mapping of core hardware
-#define SCS_BASE            (0xE000E000UL)                              /*!< System Control Space Base Address */
-#define SysTick_BASE        (SCS_BASE +  0x0010UL)                      /*!< SysTick Base Address */
-#define NVIC_BASE           (SCS_BASE +  0x0100UL)                      /*!< NVIC Base Address */
-#define SCB_BASE            (SCS_BASE +  0x0D00UL)                      /*!< System Control Block Base Address */
+#define SCS_BASE              (0xE000E000UL)                            /*!< System Control Space Base Address */
+#define SysTick_BASE          (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address */
+#define NVIC_BASE             (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address */
+#define SCB_BASE              (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Base Address */
 
 //#define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct */
 #define SysTick               ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
 #define NVIC                  ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct */
+
+
+// NVIC function
+
+static inline void nvic_enable_irq(IRQn_Type IRQn){
+
+    NVIC->ISER[0] |= (1U << IRQn);
+
+};
+
+static inline void nvic_disalbe_irq(IRQn_Type IRQn){
+
+    NVIC->ICER[0] |= (1U << IRQn);
+
+};
 
 
 
@@ -121,4 +156,4 @@ static inline void delay_ms(uint32_t ms){
 }
 
 
-#endif // MSMP0L1306_SYSTICK_H
+#endif // CORE_CM0PLUS_H

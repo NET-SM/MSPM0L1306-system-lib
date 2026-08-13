@@ -1,8 +1,9 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "msmp0l1306_systick.h"
+
 #include "mspm0l1306_base.h"
+#include "core_cm0plus.h"
 #include "mspm0_reg_utils.h"
 #include "mspm0l1306_sysctl.h"
 #include "mspm0l1306_gpio.h"

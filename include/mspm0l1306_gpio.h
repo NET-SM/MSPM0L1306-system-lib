@@ -194,6 +194,10 @@ uint32_t gpio_read                   (uint32_t pin);
 void     gpio_write                  (uint32_t pin, uint32_t value);
 void     gpio_enable_output          (uint32_t pin);
 void     gpio_enable_input           (uint32_t pin);
+void     gpio_toggle                 (uint32_t pin);
 
+typedef void (*gpio_callback_t)      (uint32_t pin);                            // TODO
+void     gpio_register_callback      (uint32_t pin, gpio_callback_t callback);  // TODO
+void     gpio_dispatch_interrupt     (uint32_t pin);                            // TODO
 
 #endif // MSPM0L1306_GPIO_H

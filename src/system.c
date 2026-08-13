@@ -175,5 +175,16 @@ void SystemCoreClockUpdate(){
         break;
     }
 
+}
+
+void GROUP1_IRQHandler(void){
+
+
+    uint32_t iidx = GPIOA->CPU_INT.IIDX;  
+    if (iidx == 0) return;                  // No pending intrrupt requests
+    
+    uint32_t pin = iidx - 1;                // Get PA from IIDX
+
+    gpio_dispatch_interrupt(pin);
 
 }

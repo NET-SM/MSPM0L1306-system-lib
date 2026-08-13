@@ -53,6 +53,14 @@ typedef enum IOMUX_PINCM
   IOMUX_PINCM28        = (27),
 } IOMUX_PINCM;
  
+
+typedef enum {
+    IOMUX_PULL_NONE = 0,
+    IOMUX_PULL_UP   = 1,
+    IOMUX_PULL_DOWN = 2,
+} iomux_pull_t;
+
+
 // ============================================================================
 // PINCM zajednička bit polja (važe za sve PINCMn registre)
 // ============================================================================
@@ -62,7 +70,7 @@ typedef enum IOMUX_PINCM
 #define IOMUX_PINCM_PF_MASK                           (0x0000003FU)
 #define IOMUX_PINCM_PC_OFS                            (7U)
 #define IOMUX_PINCM_PC_CONNECTED                      (0x00000080U) 
-#define IOMUX_PINCM_PIPID_OFS                         (16U)
+#define IOMUX_PINCM_PIPD_OFS                          (16U)
 #define IOMUX_PINCM_PIPU_OFS                          (17U)
 #define IOMUX_PINCM_INENA_OFS                         (18U)
 
@@ -284,6 +292,6 @@ typedef enum IOMUX_PINCM
 #define IOMUX_PINCM28_PF_SPI0_CS3_CD_POCI3            (0x00000003U)
 
 // Prototip generičke funkcije
-void iomux_configure_pin(uint32_t pincm, uint32_t pf, uint32_t input_enable);
+void iomux_configure_pin(uint32_t pincm, uint32_t pf, uint32_t input_enable, iomux_pull_t pull);
 
 #endif // MSPM0L1306_IOMUX_H
