@@ -81,7 +81,7 @@ void ClockInit(SystemClock_t clock){
 void CLK_OUT_SETUP(){
 
     // 1. Configure IOMUX to select the CLK_OUT function on the device pin with CLK_OUT
-    // Ovo bi trbalo da enabluje CLK_OUT na PA7
+    
     IOMUX->SECCFG.PINCM[IOMUX_PINCM8] = IOMUX_PINCM_PC_CONNECTED | IOMUX_PINCM8_PF_SYSCTL_CLK_OUT;
 
     // 2. Select the desired clock source in the EXCLKSRC field of the GENCLKCFG register.
@@ -91,7 +91,7 @@ void CLK_OUT_SETUP(){
     // enable the divider by setting the EXCLKDIVEN bit. This must be done while EXCLKEN=0 (before CLK_OUT
     // is enabled)
 
-    // SA DELITELJEM
+    // with div
     SYSCTL->SOCLOCK.GENCLKCFG = (SYSCTL->SOCLOCK.GENCLKCFG &~ 
                                  SYSCTL_GENCLKCFG_EXCLKDIVEN_MASK) |
                                  SYSCTL_GENCLKCFG_EXCLKDIVEN_ENABLE;
@@ -121,19 +121,19 @@ void Trim_Function(uint32_t rescoarse, uint32_t resfine, uint32_t cap, uint32_t 
 
     write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
                     SYSCTL_SYSOSCTRIMUSER_RESCOARSE_OFS,
-                    6, rescoarse);
+                    SYSCTL_SYSOSCTRIMUSER_RESCOARSE_WIDTH, rescoarse);
     
     write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
                     SYSCTL_SYSOSCTRIMUSER_RESFINE_OFS,
-                    4, resfine);
+                    SYSCTL_SYSOSCTRIMUSER_RESFINE_WIDTH, resfine);
     
     write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
                     SYSCTL_SYSOSCTRIMUSER_CAP_OFS,
-                    3, cap);
+                    SYSCTL_SYSOSCTRIMUSER_CAP_WIDTH, cap);
     
     write_reg_field(&SYSCTL->SOCLOCK.SYSOSCTRIMUSER,
                     SYSCTL_SYSOSCTRIMUSER_FREQ_OFS,
-                    2, freq_sel);
+                    SYSCTL_SYSOSCTRIMUSER_FREQ_WIDTH, freq_sel);
    
     // 3. Switch SYSOSC to the user-trimmed frequency by selecting USER in the FREQ field of the SYSOSCCFG register
     

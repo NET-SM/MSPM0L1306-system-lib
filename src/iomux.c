@@ -8,7 +8,8 @@ void iomux_configure_pin(uint32_t pincm, uint32_t pf, uint32_t input_enable, iom
     IOMUX->SECCFG.PINCM[pincm] |= IOMUX_PINCM_PC_CONNECTED;
     
     // What is peripheral used for
-    write_reg_field(&IOMUX->SECCFG.PINCM[pincm], IOMUX_PINCM_PF_OFS, 6, pf);
+    write_reg_field(&IOMUX->SECCFG.PINCM[pincm], IOMUX_PINCM_PF_OFS, 
+                    IOMUX_PINCM_PF_WIDTH, pf);
 
     // Pull-up Config
 
@@ -35,6 +36,10 @@ void iomux_configure_pin(uint32_t pincm, uint32_t pf, uint32_t input_enable, iom
 
         write_reg_bit(&IOMUX->SECCFG.PINCM[pincm], IOMUX_PINCM_INENA_OFS, ENABLE);
 
+    } else {
+
+        write_reg_bit(&IOMUX->SECCFG.PINCM[pincm], IOMUX_PINCM_INENA_OFS, DISABLE);
+    
     }
 
 }

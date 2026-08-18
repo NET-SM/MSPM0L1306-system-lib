@@ -5,7 +5,7 @@
 
 
 // ============================================================================
-// GPIOA modul (0x400A0000U)
+// GPIOA base (0x400A0000U)
 // ============================================================================
 
 #define GPIO_GEN_EVENT1_OFS              (0x00001080U)
@@ -139,10 +139,6 @@ typedef struct{
 
 #define GPIOA  ((GPIO_Regs *) GPIOA_BASE)
 
-
-
-#define GPIO_PWREN_ENABLE_ENABLE   (0x00000001U)
-#define GPIO_PWREN_KEY_UNLOCK_W    (0x26000000U)
 #define LED2_PIN                   (1U << 26) 
 
 #define GPIO_POLARITY_NONE         (0x0U)

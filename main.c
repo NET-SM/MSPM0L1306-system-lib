@@ -1,43 +1,27 @@
 #include "system.h"
 
 
-void s1_handler(uint32_t pin){
-    gpio_toggle(PA26);
-}
+int main(){
 
-void s2_handler(uint32_t pin){
-    gpio_toggle(PA0);
-}
-
-int main(void)
-{
-
-    iomux_configure_pin(IOMUX_PINCM19, IOMUX_PINCM19_PF_GPIOA_DIO18, 1, IOMUX_PULL_NONE);
-    iomux_configure_pin(IOMUX_PINCM15, IOMUX_PINCM15_PF_GPIOA_DIO14, 1, IOMUX_PULL_UP);
-
-    gpio_enable_power();
-    gpio_enable_input(PA18);
-    gpio_enable_input(PA14);
-
-    gpio_configure_interrupt(PA18, GPIO_POLARITY_RISE);
-    gpio_configure_interrupt(PA14, GPIO_POLARITY_FALL);
-    gpio_enable_interrupt(PA18);
-    gpio_enable_interrupt(PA14);
-
-    nvic_enable_irq(GPIOA_INT_IRQn);
-
-    iomux_configure_pin(IOMUX_PINCM27, IOMUX_PINCM27_PF_GPIOA_DIO26, 0, IOMUX_PULL_NONE);
-    gpio_enable_output(PA26);
-
-    iomux_configure_pin(IOMUX_PINCM1, IOMUX_PINCM1_PF_GPIOA_DIO00, 0, IOMUX_PULL_NONE);
-    gpio_enable_output(PA0);
+    adc_enable_power();   
+    adc_init(ADC_SYSOSC, ADC_12BIT, ADC_SCKLDIV_NO_DIV, ADC_FRANGE_24_32MHZ); 
+    adc_select_conversion_mode(ADC_SINGLE);
+    adc_config_seq_addresses(ADC_SINGLE, 0, 0);
+    adc_config_channel(0, ADC_CHANNEL_PA15);
+    adc_set_channel_vref(0, ADC_VREF_VDDA_VSSA);
+    adc_trigger_select(ADC_SW_TRIGGER);
+    adc_mode_select(ADC_AUTO);
+    adc_set_sample_time(ADC_STIME_SCOMP0, 50U);
+    adc_set_channel_stime_source(0, ADC_STIME_SCOMP0);
     
+    while (1){
+        
+        adc_enable_conversion();
+        adc_software_auto_start();
+        while(adc_is_busy()) {
 
-    gpio_register_callback(PA18, s1_handler);
-    gpio_register_callback(PA14, s2_handler);
-
-    while (1) {
-
+        };
+        volatile uint32_t result = adc_read_result(0);
+        (void) result;
     }
 }
-

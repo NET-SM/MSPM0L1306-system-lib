@@ -67,6 +67,7 @@ typedef enum {
  
 
 #define IOMUX_PINCM_PF_OFS                            (0U)
+#define IOMUX_PINCM_PF_WIDTH                          (6U)
 #define IOMUX_PINCM_PF_MASK                           (0x0000003FU)
 #define IOMUX_PINCM_PC_OFS                            (7U)
 #define IOMUX_PINCM_PC_CONNECTED                      (0x00000080U) 

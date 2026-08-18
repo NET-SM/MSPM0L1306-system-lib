@@ -75,4 +75,11 @@ typedef enum IRQn
 #define WUC_BASE                       (0x40424000U)     /*!< Base address of module WUC */
 #define FACTORYREGION_BASE             (0x41C40000U)     /*!< Base address of module FACTORYREGION */
 
+
+// PWREN Reg
+
+#define PWREN_KEY_UNLOCK_W             (0x26000000U)
+
+
+
 #endif

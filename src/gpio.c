@@ -3,7 +3,7 @@
 
 void gpio_enable_power(void){
 
-    GPIOA->GPRCM.PWREN = GPIO_PWREN_KEY_UNLOCK_W | 0x1;
+    GPIOA->GPRCM.PWREN = PWREN_KEY_UNLOCK_W | 0x1;
 
 }
 
