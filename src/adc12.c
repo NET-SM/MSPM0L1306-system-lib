@@ -113,9 +113,9 @@ void adc_set_channel_stime_source(uint32_t mem_idx, adc_stime_sel_t scomp){
 
 }
 
-void adc_set_channel_trig_policy(uint32_t mem_idx, uint32_t trig_needed){
+void adc_set_channel_trig_policy(uint32_t mem_idx, adc_trig_policy_t policy){
 
-    write_reg_bit(&ADC12->ULLEM.MEMCTL[mem_idx], ADC_MEMCTL_TRIG_OFS, trig_needed);
+    write_reg_bit(&ADC12->ULLEM.MEMCTL[mem_idx], ADC_MEMCTL_TRIG_OFS, policy);
 
 }
 
@@ -132,8 +132,6 @@ void adc_software_auto_start(void){
     // Set SC bit to start sample phase
     write_reg_bit(&ADC12->ULLEM.CTL1, ADC_CTL1_SC_OFS, ENABLE);
 
-    // TODO Sequence modes
-
 }
 
 uint32_t adc_is_busy(void){
@@ -141,6 +139,12 @@ uint32_t adc_is_busy(void){
     uint32_t status = read_reg_bit(&ADC12->ULLEM.STATUS, ADC_STATUS_BUSY_OFS);
     
     return status;
+}
+
+uint32_t adc_is_result_ready(uint32_t mem_idx){
+
+    return read_reg_bit(&ADC12->ULLEM.CPU_INT.RIS, ADC_RIS_MEMRESIFG0_OFS + mem_idx);
+
 }
 
 uint32_t adc_read_result(uint32_t mem_idx){

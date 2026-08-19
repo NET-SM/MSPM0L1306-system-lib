@@ -188,11 +188,17 @@ typedef enum{
      ADC_FRANGE_16_20MHZ = 3U,
      ADC_FRANGE_20_24MHZ = 4U,
      ADC_FRANGE_24_32MHZ = 5U,
-     // ADC_FRANGE_32_40MHZ = 6U, // MSPML1306 not compatible
-     // ADC_FRANGE_40_48MHZ = 7U, // MSPML1306 not compatible
 } adc_frange_sel_t;
 
 // MEMCTLx Enums
+
+
+typedef enum{
+
+     ADC_TRIG_AUTO_NEXT    = 0U,
+     ADC_TRIG_TRIGGER_NEXT = 1U,
+
+}adc_trig_policy_t;
 
 typedef enum{
      ADC_CHANNEL_PA25 = 2U, // ADC0.2
@@ -215,6 +221,11 @@ typedef enum{
      ADC_STIME_SCOMP1 = 1U,
 } adc_stime_sel_t;
 
+
+// CPU RIS
+
+#define ADC_RIS_MEMRESIFG0_OFS        (8U)
+#define ADC_RIS_MEMRESIFG1_OFS        (9U)
 
 // CLKCFG Macros
 #define ADC_CLKCFG_KEY_UNLOCK_W       (0xA9000000U)
@@ -293,11 +304,12 @@ void adc_trigger_select(adc_trig_sel_t trigger_select);
 void adc_mode_select(adc_samp_mode_sel_t mode);
 void adc_set_sample_time(adc_stime_sel_t scomp, uint32_t val);
 void adc_set_channel_stime_source(uint32_t mem_idx, adc_stime_sel_t scomp);
-void adc_set_channel_trig_policy(uint32_t mem_idx, uint32_t trig_needed);
+void adc_set_channel_trig_policy(uint32_t mem_idx, adc_trig_policy_t policy);
 void adc_enable_conversion(void);
 void adc_disable_conversion(void);
 void adc_software_auto_start(void);
 uint32_t adc_is_busy(void); 
+uint32_t adc_is_result_ready(uint32_t mem_idx);
 uint32_t adc_read_result(uint32_t mem_idx);
 
 
