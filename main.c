@@ -1,45 +1,59 @@
 #include "system.h"
 
-
+#define UART_CTL0_LBE_OFS  (2U)
 int main(){
 
-    adc_enable_power();     
-    adc_init(ADC_SYSOSC, ADC_12BIT, ADC_SCKLDIV_NO_DIV, ADC_FRANGE_24_32MHZ); 
+    // Confgigure RX and TX pin using iomux registers:
+    iomux_configure_pin(IOMUX_PINCM9, IOMUX_PINCM9_PF_UART0_TX, DISABLE, IOMUX_PULL_NONE);
+    iomux_configure_pin(IOMUX_PINCM10, IOMUX_PINCM10_PF_UART0_RX, ENABLE, IOMUX_PULL_NONE);
 
-    adc_select_conversion_mode(ADC_SEQUENCE);
-    adc_config_seq_addresses(ADC_SEQUENCE, 0, 1);
+    // Reset the peripheral using UARTx.RSTCTL register
+    uart_reset();
 
-
-    adc_config_channel(0, ADC_CHANNEL_PA15);
-    adc_set_channel_vref(0, ADC_VREF_VDDA_VSSA);
-    adc_set_channel_stime_source(0, ADC_STIME_SCOMP0);
-    adc_set_channel_trig_policy(0, ADC_TRIG_AUTO_NEXT);
-
-    adc_config_channel(1, ADC_CHANNEL_PA25);
-    adc_set_channel_vref(1, ADC_VREF_VDDA_VSSA);
-    adc_set_channel_stime_source(1, ADC_STIME_SCOMP1);
-    adc_set_channel_trig_policy(1, ADC_TRIG_AUTO_NEXT);
-
-    adc_trigger_select(ADC_SW_TRIGGER);
-    adc_mode_select(ADC_AUTO);
-    adc_set_sample_time(ADC_STIME_SCOMP0, 50U);
-    adc_set_sample_time(ADC_STIME_SCOMP1, 50U);
+    // Enable the power to UART peripheral using the UARTx.PWREN register
+    uart_enable_power();
+    //write_reg_bit(&UART->CTL0, UART_CTL0_LBE_OFS, ENABLE);
     
-    
-    
-    while (1){
-        
-        adc_enable_conversion();
-        adc_software_auto_start();
 
-        while(!adc_is_result_ready(0)) {  };
-        volatile uint32_t result_pa15 = adc_read_result(0);
+    // Select the UART function clock source and divide options using UART.CLKSEL and UART.CLKDIV
+    // registers.
+    uart_set_clock_config(UART_CLKSEL_BUSCLK, UART_CLKDIV_NO_DIV);
+
+    // Disable the UART by clearing the UART.CTL0.ENABLE bit.
+    uart_disable();
+
+    // Use the baud-rate equation in Section 21.2.3.4 to calculate the UARTx.IBRD and UARTx.FBRD registers
+    uart_set_baudrate(SystemCoreClock, 115200);
+
+    // Write the desired serial parameters to the UART.LCRH register
+
+    uart_set_data_bits(UART_LCRH_WLEN_8B);
+    uart_set_parity(UART_PARITY_NONE);
+    uart_set_stop_bits(UART_LCRH_STP2_1SB);
+
+    // Enable the UART by setting the UART.CTL0.ENABLE bit
+    uart_enable();
 
 
-        while(!adc_is_result_ready(1)) {  };
-        volatile uint32_t result_pa25 = adc_read_result(1);
+    char buffer[36];
+    uart_read_string(buffer, sizeof(buffer));
 
-        (void) result_pa15;
-        (void) result_pa25;
+    while (1)
+    {
+        uart_write_string("Buffer je sada pun\n");
+        delay_ms(1000);
+        uart_write_string("Buffer ce sada biti procitan:\n");
+        delay_ms(1000);
+        for(int i = 0; i < sizeof(buffer); i++){
+            uart_send_blocking(buffer[i]);
+        }
+        uart_send_blocking('\n');
+        uart_write_string("Kraj loopa");
+        delay_ms(10000);
     }
+    
+
+
+
+
 }

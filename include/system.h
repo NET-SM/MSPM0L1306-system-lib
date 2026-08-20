@@ -9,6 +9,7 @@
 #include "mspm0l1306_gpio.h"
 #include "mspm0l1306_iomux.h"
 #include "mspm0l1306_adc12.h"
+#include "mspm0l1306_uart.h"
 
 typedef enum {
     CLOCK_4MHZ = 4,

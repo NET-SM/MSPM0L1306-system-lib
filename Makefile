@@ -9,7 +9,7 @@ CFLAGS =  \
 	-mcpu=cortex-m0plus \
 	-mthumb \
 	-O0 \
-	-g \
+	-g3 \
 	-Wall \
 	-Iinclude \
 	-Icore
