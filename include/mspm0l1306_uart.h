@@ -152,6 +152,62 @@ typedef enum{
      UART_LCRH_WLEN_8B  = 3U,          // 8 data bits trasmitted or recieved in frame
 } uart_wlen_t;
 
+// IIDX Macros for interrupts
+
+#define UART_CPU_INT_IIDX_STAT_NO_INTR  (0x00000000U)       // No pending interrupt
+#define UART_CPU_INT_IIDX_STAT_RTFG     (0x00000001U)       /* UART recieve time-out interrupt; Interrupt flag: RT;
+                                                               Interrupt priority highest */
+#define UART_CPU_INT_IIDX_STAT_FEFG     (0x00000002U)       /* UART framing error interrupt;
+                                                               Interrupt flag: FE  */
+#define UART_CPU_INT_IIDX_STAT_PEFG     (0x00000003U)       /* UART parity error interrupt;
+                                                               Interrupt flag: PE  */
+#define UART_CPU_INT_IIDX_STAT_BEFG     (0x00000004U)       /* UART break error interrupt;
+                                                               Interrupt flag: BE  */
+#define UART_CPU_INT_IIDX_STAT_OEFG     (0x00000005U)       /* UART recieve overrun error interrupt;
+                                                               Interrupt flag: OE  */
+#define UART_CPU_INT_IIDX_STAT_RXNE     (0x00000006U)       /* Negative edge on UARTxRXD
+                                                               interrupt; Interrupt Flag: RXNE */
+#define UART_CPU_INT_IIDX_STAT_RXPE     (0x00000007U)       /* Positive edge on UARTxRXD
+                                                               interrupt; Interrupt Flag: RXPE */
+#define UART_CPU_INT_IIDX_STAT_LINC0    (0x00000008U)       /* LIN capture 0 / match interrupt;
+                                                               Interrupt Flag: LINC0 */
+#define UART_CPU_INT_IIDX_STAT_LINC1    (0x00000009U)       /* LIN capture 1 interrupt; Interrupt
+                                                               Flag: LINC1 */
+#define UART_CPU_INT_IIDX_STAT_LINOVF   (0x0000000AU)       /* LIN hardware counter overflow
+                                                               interrupt; Interrupt Flag: LINOVF */
+#define UART_CPU_INT_IIDX_STAT_RXIFG    (0x0000000BU)       /* UART receive interrupt; Interrupt
+                                                               Flag: RX */
+#define UART_CPU_INT_IIDX_STAT_TXIFG    (0x0000000CU)       /* UART transmit interrupt; Interrupt
+                                                               Flag: TX */
+#define UART_CPU_INT_IIDX_STAT_EOT      (0x0000000DU)       /* UART end of transmission interrupt
+                                                               (transmit serializer empty);
+                                                               Interrupt Flag: EOT */
+#define UART_CPU_INT_IIDX_STAT_MODE_9B  (0x0000000EU)       /* 9-bit mode address match interrupt;
+                                                               Interrupt Flag: MODE_9B */
+#define UART_CPU_INT_IIDX_STAT_CTS      (0x0000000FU)       /* UART Clear to Send Modem interrupt;
+                                                               Interrupt Flag: CTS */
+          
+// IMASK Macros
+
+#define UART_CPU_INT_IMASK_NERR_OFS           (17U)
+#define UART_CPU_INT_IMASK_DMA_DONE_TX_OFS    (16U)
+#define UART_CPU_INT_IMASK_DMA_DONE_RX_OFS    (15U)
+#define UART_CPU_INT_IMASK_DMA_CTS_OFS        (14U)
+#define UART_CPU_INT_IMASK_DMA_ADDR_MATCH_OFS (13U)
+#define UART_CPU_INT_IMASK_DMA_EOT_OFS        (12U)
+#define UART_CPU_INT_IMASK_DMA_TXINT_OFS      (11U)
+#define UART_CPU_INT_IMASK_DMA_RXINT_OFS      (10U)
+#define UART_CPU_INT_IMASK_LINOVF_OFS         (9U)
+#define UART_CPU_INT_IMASK_LINC1_OFS          (8U)
+#define UART_CPU_INT_IMASK_LINC0_OFS          (7U)
+#define UART_CPU_INT_IMASK_RXPE_OFS           (6U)
+#define UART_CPU_INT_IMASK_RXNE_OFS           (5U)
+#define UART_CPU_INT_IMASK_OVRERR_OFS         (4U)
+#define UART_CPU_INT_IMASK_BRKERR_OFS         (3U)
+#define UART_CPU_INT_IMASK_PARERR_OFS         (2U)
+#define UART_CPU_INT_IMASK_FRMERR_OFS         (1U)
+#define UART_CPU_INT_IMASK_RTOUT_OFS          (0U)
+
 // RSTCTL Macros
 
 #define UART_RSTCTL_KEY_UNLOCK_W       (0xB1000000U)
@@ -233,4 +289,18 @@ uint8_t  uart_receive_blocking (void);
 void     uart_write_string     (const char *str);
 void     uart_read_string      (char *buffer, uint32_t size);
 
+// Novo ig
+
+void uart_enable_rx_interrupt(void);
+void uart_disable_rx_interrupt(void);
+
+uint32_t uart_read(uint8_t *data);
+
+void uart_rx_interrupt_handler(void);
+void uart_tx_interrupt_handler(void);
+
+void uart_enable_tx_interrupt(void);
+
+void uart_write_byte_interrupt(uint8_t data);
+void uart_write_string_interrupt(const char *str);
 #endif // MSPM0L1306_UART_H

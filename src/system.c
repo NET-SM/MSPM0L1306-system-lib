@@ -188,3 +188,26 @@ void GROUP1_IRQHandler(void){
     gpio_dispatch_interrupt(pin);
 
 }
+
+void UART0_IRQHandler(void){
+
+    uint32_t iidx = UART->CPU_INT.IIDX;
+    if (iidx == 0) return;                 // No pending interrupt requests
+    
+    switch(iidx){
+        case UART_CPU_INT_IIDX_STAT_RXIFG:
+            
+            uart_rx_interrupt_handler();
+
+        break;
+
+        case UART_CPU_INT_IIDX_STAT_TXIFG:
+
+            uart_tx_interrupt_handler();
+        
+        break;
+
+        default:
+        break;
+    }
+}

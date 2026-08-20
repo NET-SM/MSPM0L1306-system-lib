@@ -1,6 +1,20 @@
 #include "mspm0l1306_uart.h"
 #include "mspm0_reg_utils.h"
 
+#define UART_RX_BUFFER_SIZE 128
+#define UART_TX_BUFFER_SIZE 128
+
+
+// For UART interrupt ringbuffers
+static volatile uint8_t rx_buffer[UART_RX_BUFFER_SIZE];
+static volatile uint8_t tx_buffer[UART_TX_BUFFER_SIZE];
+
+static volatile uint32_t rx_read_index  = 0;
+static volatile uint32_t rx_write_index = 0;
+
+static volatile uint32_t tx_read_index  = 0;
+static volatile uint32_t tx_write_index = 0;
+
 void uart_reset(void){
 
     UART->GPRCM.RSTCTL = (UART_RSTCTL_KEY_UNLOCK_W | UART_RSTCTL_RESETASSERT);
@@ -224,3 +238,67 @@ void uart_read_string(char *buffer, uint32_t size){
     buffer[i] = '\0';
 
 }
+
+// ===================================================== UART INTERRUPT FUNCTIONS =====================================
+
+void uart_enable_tx_interrupt(){
+
+    UART->CPU_INT.IMASK = reg_write_bit(UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_DMA_TXINT_OFS, ENABLE);
+
+}
+
+void uart_rx_interrupt_handler(void){
+
+    uint8_t data = uart_read_byte();
+
+    rx_buffer[rx_write_index] = data;
+    
+    rx_write_index++;
+
+    if(rx_write_index >= UART_RX_BUFFER_SIZE){
+        rx_write_index = 0;
+    }
+
+}
+
+void uart_tx_interrupt_handler(void){
+
+    if( tx_read_index == tx_write_index){
+        // No more data to be sent
+        // Turn off TX interrupt
+        return;
+    }
+    
+    uart_write_byte(tx_buffer[tx_read_index]);
+
+    tx_read_index++;
+
+    if(tx_read_index >= UART_TX_BUFFER_SIZE){
+        tx_read_index = 0;
+    }
+
+}
+
+uint8_t uart_write_byte_interrupt(uint8_t data){
+
+    uint32_t next_index = tx_write_index + 1;
+
+    if (next_index >= UART_TX_BUFFER_SIZE) {
+        next_index = 0;
+    }
+
+    // Buffer is full
+    if (next_index == tx_read_index){
+        return 0;
+    }
+
+    tx_buffer[tx_write_index] = data;
+    tx_write_index = next_index;
+
+    uart_enable_tx_interrupt();
+
+
+
+}
+
+void uart_write_string_interrupt(const char *str);
