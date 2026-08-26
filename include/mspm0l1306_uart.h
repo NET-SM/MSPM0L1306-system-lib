@@ -192,11 +192,11 @@ typedef enum{
 #define UART_CPU_INT_IMASK_NERR_OFS           (17U)
 #define UART_CPU_INT_IMASK_DMA_DONE_TX_OFS    (16U)
 #define UART_CPU_INT_IMASK_DMA_DONE_RX_OFS    (15U)
-#define UART_CPU_INT_IMASK_DMA_CTS_OFS        (14U)
-#define UART_CPU_INT_IMASK_DMA_ADDR_MATCH_OFS (13U)
-#define UART_CPU_INT_IMASK_DMA_EOT_OFS        (12U)
-#define UART_CPU_INT_IMASK_DMA_TXINT_OFS      (11U)
-#define UART_CPU_INT_IMASK_DMA_RXINT_OFS      (10U)
+#define UART_CPU_INT_IMASK_CTS_OFS            (14U)
+#define UART_CPU_INT_IMASK_ADDR_MATCH_OFS     (13U)
+#define UART_CPU_INT_IMASK_EOT_OFS            (12U)
+#define UART_CPU_INT_IMASK_TXINT_OFS          (11U)
+#define UART_CPU_INT_IMASK_RXINT_OFS          (10U)
 #define UART_CPU_INT_IMASK_LINOVF_OFS         (9U)
 #define UART_CPU_INT_IMASK_LINC1_OFS          (8U)
 #define UART_CPU_INT_IMASK_LINC0_OFS          (7U)
@@ -291,16 +291,27 @@ void     uart_read_string      (char *buffer, uint32_t size);
 
 // Novo ig
 
+// Enable & disable
 void uart_enable_rx_interrupt(void);
 void uart_disable_rx_interrupt(void);
-
-uint32_t uart_read(uint8_t *data);
+void uart_enable_tx_interrupt(void);
+void uart_disable_tx_interrupt(void);
 
 void uart_rx_interrupt_handler(void);
+uint8_t uart_rx_available(void);
+uint32_t uart_rx_free_space(void);
+uint32_t uart_rx_unused_data(void);
+uint8_t uart_read_byte_interrupt(uint8_t *out);
+
+void uart_read_rx_buffer(char *buffer, uint32_t length);
+
 void uart_tx_interrupt_handler(void);
 
-void uart_enable_tx_interrupt(void);
 
-void uart_write_byte_interrupt(uint8_t data);
-void uart_write_string_interrupt(const char *str);
+
+
+
+
+
+
 #endif // MSPM0L1306_UART_H

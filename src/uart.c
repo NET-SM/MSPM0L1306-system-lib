@@ -1,8 +1,8 @@
 #include "mspm0l1306_uart.h"
 #include "mspm0_reg_utils.h"
 
-#define UART_RX_BUFFER_SIZE 128
-#define UART_TX_BUFFER_SIZE 128
+#define UART_RX_BUFFER_SIZE 7
+#define UART_TX_BUFFER_SIZE 7
 
 
 // For UART interrupt ringbuffers
@@ -32,11 +32,6 @@ void uart_disable_power(void){
 
 };
 
-void uart_init(){
-
-    // TODO wrapper fun
-
-}
 
 void uart_set_parity(uart_parity_t parity){
     
@@ -241,11 +236,28 @@ void uart_read_string(char *buffer, uint32_t size){
 
 // ===================================================== UART INTERRUPT FUNCTIONS =====================================
 
-void uart_enable_tx_interrupt(){
+void uart_enable_rx_interrupt(void){
 
-    UART->CPU_INT.IMASK = reg_write_bit(UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_DMA_TXINT_OFS, ENABLE);
-
+    write_reg_bit(&UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_RXINT_OFS, ENABLE);
 }
+
+void uart_enable_tx_interrupt(void){
+
+    write_reg_bit(&UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_TXINT_OFS, ENABLE);
+}
+
+void uart_disable_tx_interrupt(void){
+
+    write_reg_bit(&UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_TXINT_OFS, DISABLE);
+}
+
+void uart_disable_rx_interrupt(void){
+
+    write_reg_bit(&UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_RXINT_OFS, DISABLE);
+}
+
+
+
 
 void uart_rx_interrupt_handler(void){
 
@@ -255,50 +267,61 @@ void uart_rx_interrupt_handler(void){
     
     rx_write_index++;
 
+    
     if(rx_write_index >= UART_RX_BUFFER_SIZE){
         rx_write_index = 0;
     }
-
 }
 
-void uart_tx_interrupt_handler(void){
-
-    if( tx_read_index == tx_write_index){
-        // No more data to be sent
-        // Turn off TX interrupt
-        return;
-    }
+uint8_t uart_rx_available(void){
     
-    uart_write_byte(tx_buffer[tx_read_index]);
+    if(rx_read_index == rx_write_index) return 0;    // No new data
+    else return 1;                                   // New data
+}
 
-    tx_read_index++;
+uint32_t uart_rx_free_space(void){
 
-    if(tx_read_index >= UART_TX_BUFFER_SIZE){
-        tx_read_index = 0;
-    }
+    uint32_t free_space = (rx_read_index - rx_write_index - 1 + UART_RX_BUFFER_SIZE) % UART_RX_BUFFER_SIZE;
+    return free_space;
 
 }
 
-uint8_t uart_write_byte_interrupt(uint8_t data){
+uint32_t uart_rx_unused_data(void){
 
-    uint32_t next_index = tx_write_index + 1;
+    uint32_t free_space = uart_rx_free_space();
 
-    if (next_index >= UART_TX_BUFFER_SIZE) {
-        next_index = 0;
-    }
+    uint32_t unread_data = (UART_RX_BUFFER_SIZE - 1) - free_space;
 
-    // Buffer is full
-    if (next_index == tx_read_index){
-        return 0;
-    }
-
-    tx_buffer[tx_write_index] = data;
-    tx_write_index = next_index;
-
-    uart_enable_tx_interrupt();
-
-
-
+    return unread_data;
 }
 
-void uart_write_string_interrupt(const char *str);
+uint8_t uart_read_byte_interrupt(uint8_t *out){
+
+    // if(rx_read_index == rx_write_index) return 0; // Extra safety
+
+    *out =  rx_buffer[rx_read_index];
+    rx_read_index++;
+    if (rx_read_index >= UART_RX_BUFFER_SIZE){
+        rx_read_index = 0;
+    }
+    return 1;
+}
+
+void uart_read_rx_buffer(char *buffer, uint32_t length){
+
+    if(length >= UART_RX_BUFFER_SIZE) return;
+
+    for(uint32_t i = 0; i < length - 1; i++){
+       
+        buffer[i] = rx_buffer[rx_read_index];
+
+        rx_read_index++;
+
+        if(rx_read_index >= UART_RX_BUFFER_SIZE) rx_read_index = 0;
+    }
+
+    buffer[length] = '\0';
+    
+}
+
+// TX INTERRUPT FUN

@@ -192,7 +192,6 @@ void GROUP1_IRQHandler(void){
 void UART0_IRQHandler(void){
 
     uint32_t iidx = UART->CPU_INT.IIDX;
-    if (iidx == 0) return;                 // No pending interrupt requests
     
     switch(iidx){
         case UART_CPU_INT_IIDX_STAT_RXIFG:

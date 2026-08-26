@@ -1,6 +1,6 @@
 #include "system.h"
 
-#define UART_CTL0_LBE_OFS  (2U)
+
 int main(){
 
     // Confgigure RX and TX pin using iomux registers:
@@ -34,26 +34,29 @@ int main(){
     // Enable the UART by setting the UART.CTL0.ENABLE bit
     uart_enable();
 
-
-    char buffer[36];
-    uart_read_string(buffer, sizeof(buffer));
-
-    while (1)
-    {
-        uart_write_string("Buffer je sada pun\n");
-        delay_ms(1000);
-        uart_write_string("Buffer ce sada biti procitan:\n");
-        delay_ms(1000);
-        for(int i = 0; i < sizeof(buffer); i++){
-            uart_send_blocking(buffer[i]);
-        }
-        uart_send_blocking('\n');
-        uart_write_string("Kraj loopa");
-        delay_ms(10000);
-    }
+    uart_enable_rx_interrupt();
+    nvic_enable_irq(UART0_INT_IRQn);
     
+    
+    //uint8_t r1 = uart_tx_buffer_put_str("ovo je moj prvi put da pisem sto ovako ali nikada ranije nisam verovao da cu da pisem nesto ovako veliko i duboko :D sta zn\r\n");
+    uint8_t r1 = uart_tx_buffer_put_str("String");
+    uint8_t r2 = uart_tx_buffer_put_str("Drugi");
+
+    while(1){
+        
+        //if(uart_rx_available()){    // RX bufer ima upisane podatke koji nisu procitani
+            
+            //uart_from_rx_to_tx_copy();
+
+            //length = uart_rx_unused_data();            // Racuna koliko ima novih podataka
+            //uart_read_rx_buffer(temp_buffer, length);  // Upisuje podatke iz rx_buf u temp_buf
+            //
+            //uart_tx_buffer_put_data(temp_buffer, length);           // Upis u tx_buf i sendback
+        //}
 
 
 
-
+    }   
 }
+
+
