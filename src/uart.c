@@ -1,8 +1,8 @@
 #include "mspm0l1306_uart.h"
 #include "mspm0_reg_utils.h"
 
-#define UART_RX_BUFFER_SIZE 7
-#define UART_TX_BUFFER_SIZE 7
+#define UART_RX_BUFFER_SIZE 6
+#define UART_TX_BUFFER_SIZE 6
 
 
 // For UART interrupt ringbuffers
@@ -325,3 +325,43 @@ void uart_read_rx_buffer(char *buffer, uint32_t length){
 }
 
 // TX INTERRUPT FUN
+
+uint8_t uart_is_tx_buffer_empty(void){
+
+    return tx_read_index == tx_write_index;
+}
+
+uint8_t uart_tx_buffer_put_byte(uint8_t byte){
+
+    uint32_t next = tx_write_index + 1;
+    if(next >= UART_TX_BUFFER_SIZE){
+        next = 0;
+    }
+
+    if( next == tx_read_index){           // Buffer je pun
+        return 0;
+    }
+
+    tx_buffer[tx_write_index] = byte;
+    tx_write_index = next;
+
+    uart_enable_tx_interrupt();
+
+    return 1;
+}
+
+void uart_tx_interrupt_handler(void){
+
+    if(tx_read_index == tx_write_index){
+        uart_disable_tx_interrupt();
+        return;
+    }
+
+    uart_write_byte(tx_buffer[tx_read_index]);
+    
+    tx_read_index++;
+    if(tx_read_index >= UART_TX_BUFFER_SIZE){
+        tx_read_index = 0;
+    }
+
+}

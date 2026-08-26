@@ -39,20 +39,24 @@ int main(){
     
     
     //uint8_t r1 = uart_tx_buffer_put_str("ovo je moj prvi put da pisem sto ovako ali nikada ranije nisam verovao da cu da pisem nesto ovako veliko i duboko :D sta zn\r\n");
-    uint8_t r1 = uart_tx_buffer_put_str("String");
-    uint8_t r2 = uart_tx_buffer_put_str("Drugi");
+    uint8_t r1 = uart_tx_buffer_put_byte('a');
+    uint8_t r2 = uart_tx_buffer_put_byte('b');
+    uint8_t r3 = uart_tx_buffer_put_byte('c');
+    uint8_t r4 = uart_tx_buffer_put_byte('d');
+    uint8_t r5 = uart_tx_buffer_put_byte('e');
+    uint8_t r6 = uart_tx_buffer_put_byte('f');
+
+    for (volatile i = 0; i < 4000; i++);
+
+    uint8_t r7 = uart_tx_buffer_put_byte('g');
 
     while(1){
         
-        //if(uart_rx_available()){    // RX bufer ima upisane podatke koji nisu procitani
+        if(uart_is_tx_buffer_empty){
+            uart_write_string("Prazno");
+        
             
-            //uart_from_rx_to_tx_copy();
-
-            //length = uart_rx_unused_data();            // Racuna koliko ima novih podataka
-            //uart_read_rx_buffer(temp_buffer, length);  // Upisuje podatke iz rx_buf u temp_buf
-            //
-            //uart_tx_buffer_put_data(temp_buffer, length);           // Upis u tx_buf i sendback
-        //}
+        }
 
 
 

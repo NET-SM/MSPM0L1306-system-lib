@@ -307,7 +307,8 @@ void uart_read_rx_buffer(char *buffer, uint32_t length);
 
 void uart_tx_interrupt_handler(void);
 
-
+uint8_t uart_is_tx_buffer_empty(void);
+uint8_t uart_tx_buffer_put_byte(uint8_t byte);
 
 
 
