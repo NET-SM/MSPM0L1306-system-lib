@@ -257,7 +257,7 @@ void uart_disable_rx_interrupt(void){
     write_reg_bit(&UART->CPU_INT.IMASK, UART_CPU_INT_IMASK_RXINT_OFS, DISABLE);
 }
 
-
+// RX INTERRUPTS FUN
 void uart_rx_interrupt_handler(void){
 
     uint8_t data = uart_read_byte();
@@ -268,7 +268,7 @@ void uart_rx_interrupt_handler(void){
     }
 
     // Overflow occured
-    if(next = rx_read_index){
+    if(next == rx_read_index){
         rx_overflow = 1;
         return;
     }
@@ -370,30 +370,6 @@ void uart_test_inject_rx(const uint8_t *data, uint32_t len){
 
 // TX INTERRUPT FUN
 
-uint8_t uart_is_tx_buffer_empty(void){
-
-    return tx_read_index == tx_write_index;
-}
-
-uint8_t uart_tx_buffer_put_byte(uint8_t byte){
-
-    uint32_t next = tx_write_index + 1;
-    if(next >= UART_TX_BUFFER_SIZE){
-        next = 0;
-    }
-
-    if( next == tx_read_index){           // Buffer je pun
-        return 0;
-    }
-
-    tx_buffer[tx_write_index] = byte;
-    tx_write_index = next;
-
-    uart_enable_tx_interrupt();
-
-    return 1;
-}
-
 void uart_tx_interrupt_handler(void){
 
     if(tx_read_index == tx_write_index){
@@ -408,4 +384,55 @@ void uart_tx_interrupt_handler(void){
         tx_read_index = 0;
     }
 
+}
+
+
+uint8_t uart_tx_buffer_empty(void){
+
+    if(tx_read_index ==  tx_write_index) return 1;
+    return 0;
+}
+
+uint32_t uart_tx_free_space(void){
+    
+    uint32_t free_space = (tx_read_index - tx_write_index - 1 
+                           + UART_TX_BUFFER_SIZE) % UART_TX_BUFFER_SIZE;
+    
+    
+    return free_space;
+}
+
+uint8_t uart_tx_buffer_put_byte(uint8_t byte){
+
+    uint32_t next = tx_write_index + 1;
+    if(next >= UART_TX_BUFFER_SIZE){
+        next = 0;
+    }
+
+    if( next == tx_read_index){           // Buffer je pun
+        return 0;
+    }
+
+
+    tx_buffer[tx_write_index] = byte;
+    tx_write_index = next;
+
+
+    uart_enable_tx_interrupt();
+
+    return 1;
+}
+
+uint32_t uart_tx_buffer_put_string(const char* str){
+    
+    uint32_t count = 0;
+
+    while(str[count] != '\0'){
+        if(uart_tx_buffer_put_byte((uint8_t)str[count]) == 0){
+            break;
+        }
+        count++;
+    }
+
+    return count;
 }

@@ -18,7 +18,7 @@ extern uint32_t __bss_start__;
 extern uint32_t __bss_end__;
 extern uint32_t __StackTop;
 
-typedef void (*pFunc) (void);  // Jos uvek nisam najsigurniji sta se tacno radi ovde ali ovo je pointer f-ja
+typedef void (*pFunc) (void); 
 
 // Forward declaration of the default fault Handelers
 

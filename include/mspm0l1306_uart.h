@@ -308,7 +308,10 @@ void      uart_rx_clear_overflow(void);
 void uart_test_inject_rx(const uint8_t *data, uint32_t len);  // TO DELETE
 
 // TX Interrupt
-void uart_tx_interrupt_handler(void);
-uint8_t uart_tx_buffer_put_byte(uint8_t byte);
+void      uart_tx_interrupt_handler(void);       // TODO CHECKKKKK
+uint8_t   uart_tx_buffer_put_byte(uint8_t byte);
+uint32_t  uart_tx_buffer_put_string(const char *str);
+uint32_t  uart_tx_free_space(void);
+uint8_t   uart_tx_buffer_empty(void);
 
 #endif // MSPM0L1306_UART_H
