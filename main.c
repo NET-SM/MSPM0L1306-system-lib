@@ -34,32 +34,34 @@ int main(){
     // Enable the UART by setting the UART.CTL0.ENABLE bit
     uart_enable();
 
+    // Enables RX Interrupt 
     uart_enable_rx_interrupt();
     nvic_enable_irq(UART0_INT_IRQn);
     
     
-    //uint8_t r1 = uart_tx_buffer_put_str("ovo je moj prvi put da pisem sto ovako ali nikada ranije nisam verovao da cu da pisem nesto ovako veliko i duboko :D sta zn\r\n");
-    uint8_t r1 = uart_tx_buffer_put_byte('a');
-    uint8_t r2 = uart_tx_buffer_put_byte('b');
-    uint8_t r3 = uart_tx_buffer_put_byte('c');
-    uint8_t r4 = uart_tx_buffer_put_byte('d');
-    uint8_t r5 = uart_tx_buffer_put_byte('e');
-    uint8_t r6 = uart_tx_buffer_put_byte('f');
+    char test_data[] = "1234567890";
+    uart_test_inject_rx((uint8_t*)test_data, sizeof(test_data) - 1);
+    uart_write_string("Overflow: ");
+    uart_write_string(uart_rx_overflow_occured() ? "DA\r\n" : "NE\r\n");
+    
+    char buf[10];
+    uint32_t got = uart_read_rx_buffer(buf, sizeof(buf));
 
-    for (volatile i = 0; i < 4000; i++);
+    uart_write_string("Read #1 (predugacak length) got=");
+    uart_send_blocking((uint8_t)('0' + got));
+    uart_write_string("\r\n");
 
-    uint8_t r7 = uart_tx_buffer_put_byte('g');
+    char buf2[4];
+    uint32_t got1 = uart_read_rx_buffer(buf2, sizeof(buf2));   // traži 4, ima manje (5 kapacitet, deo možda overflow-ovan)
+    uart_write_string("Read #2 got=");
+    uart_send_blocking((uint8_t)('0' + got1));
+    uart_write_string(" sadrzaj=");
+    uart_write_string(buf2);
+    uart_write_string("\r\n");
+
 
     while(1){
         
-        if(uart_is_tx_buffer_empty){
-            uart_write_string("Prazno");
-        
-            
-        }
-
-
-
     }   
 }
 

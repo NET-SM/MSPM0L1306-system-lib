@@ -289,30 +289,26 @@ uint8_t  uart_receive_blocking (void);
 void     uart_write_string     (const char *str);
 void     uart_read_string      (char *buffer, uint32_t size);
 
-// Novo ig
-
-// Enable & disable
+// Enable & disable interrupt
 void uart_enable_rx_interrupt(void);
 void uart_disable_rx_interrupt(void);
 void uart_enable_tx_interrupt(void);
 void uart_disable_tx_interrupt(void);
 
-void uart_rx_interrupt_handler(void);
-uint8_t uart_rx_available(void);
-uint32_t uart_rx_free_space(void);
-uint32_t uart_rx_unused_data(void);
-uint8_t uart_read_byte_interrupt(uint8_t *out);
+// RX Interrupt
+void      uart_rx_interrupt_handler(void);
+uint8_t   uart_rx_available(void);
+uint32_t  uart_rx_free_space(void);
+uint32_t  uart_rx_unused_data(void);
+uint8_t   uart_read_byte_interrupt(uint8_t *out);
+uint32_t  uart_read_rx_buffer(char *buffer, uint32_t length);
+uint8_t   uart_rx_overflow_occured(void);
+void      uart_rx_clear_overflow(void);
 
-void uart_read_rx_buffer(char *buffer, uint32_t length);
+void uart_test_inject_rx(const uint8_t *data, uint32_t len);  // TO DELETE
 
+// TX Interrupt
 void uart_tx_interrupt_handler(void);
-
-uint8_t uart_is_tx_buffer_empty(void);
 uint8_t uart_tx_buffer_put_byte(uint8_t byte);
-
-
-
-
-
 
 #endif // MSPM0L1306_UART_H

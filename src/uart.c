@@ -11,6 +11,7 @@ static volatile uint8_t tx_buffer[UART_TX_BUFFER_SIZE];
 
 static volatile uint32_t rx_read_index  = 0;
 static volatile uint32_t rx_write_index = 0;
+static volatile uint8_t  rx_overflow    = 0;
 
 static volatile uint32_t tx_read_index  = 0;
 static volatile uint32_t tx_write_index = 0;
@@ -257,28 +258,55 @@ void uart_disable_rx_interrupt(void){
 }
 
 
-
-
 void uart_rx_interrupt_handler(void){
 
     uint8_t data = uart_read_byte();
 
-    rx_buffer[rx_write_index] = data;
-    
-    rx_write_index++;
-
-    
-    if(rx_write_index >= UART_RX_BUFFER_SIZE){
-        rx_write_index = 0;
+    uint32_t next = rx_write_index + 1;
+    if(next >= UART_RX_BUFFER_SIZE){
+        next = 0;
     }
+
+    // Overflow occured
+    if(next = rx_read_index){
+        rx_overflow = 1;
+        return;
+    }
+
+    rx_buffer[rx_write_index] = data;
+    rx_write_index = next;
+}
+
+// Reads a byte from RX Ring buffer
+uint8_t uart_read_byte_interrupt(uint8_t *out){
+
+    if(rx_read_index == rx_write_index) return 0; // Extra safety
+
+    *out =  rx_buffer[rx_read_index];
+    rx_read_index++;
+    if (rx_read_index >= UART_RX_BUFFER_SIZE){
+        rx_read_index = 0;
+    }
+    return 1;
+}
+
+uint8_t uart_rx_overflow_occured(void){
+    return rx_overflow;
+}
+
+void uart_rx_clear_overflow(void){
+    rx_overflow = 0;
 }
 
 uint8_t uart_rx_available(void){
-    
     if(rx_read_index == rx_write_index) return 0;    // No new data
     else return 1;                                   // New data
 }
 
+
+// Calculates how many open slots are left in the RX buffer
+// Greska ovde potencijalno, -1 je okej ali se koristi kada zelimo da postoji jedan open slot u bufferu za
+// signaliziranje kraja
 uint32_t uart_rx_free_space(void){
 
     uint32_t free_space = (rx_read_index - rx_write_index - 1 + UART_RX_BUFFER_SIZE) % UART_RX_BUFFER_SIZE;
@@ -289,29 +317,24 @@ uint32_t uart_rx_free_space(void){
 uint32_t uart_rx_unused_data(void){
 
     uint32_t free_space = uart_rx_free_space();
-
     uint32_t unread_data = (UART_RX_BUFFER_SIZE - 1) - free_space;
-
     return unread_data;
 }
 
-uint8_t uart_read_byte_interrupt(uint8_t *out){
 
-    // if(rx_read_index == rx_write_index) return 0; // Extra safety
 
-    *out =  rx_buffer[rx_read_index];
-    rx_read_index++;
-    if (rx_read_index >= UART_RX_BUFFER_SIZE){
-        rx_read_index = 0;
+uint32_t uart_read_rx_buffer(char *buffer, uint32_t length){
+
+    if( length == 0 || length > UART_RX_BUFFER_SIZE) return 0;
+
+    uint32_t available = uart_rx_unused_data();
+    uint32_t to_copy   = length - 1;
+
+    if(to_copy > available){
+        to_copy = available;
     }
-    return 1;
-}
 
-void uart_read_rx_buffer(char *buffer, uint32_t length){
-
-    if(length >= UART_RX_BUFFER_SIZE) return;
-
-    for(uint32_t i = 0; i < length - 1; i++){
+    for(uint32_t i = 0; i < to_copy; i++){
        
         buffer[i] = rx_buffer[rx_read_index];
 
@@ -320,8 +343,29 @@ void uart_read_rx_buffer(char *buffer, uint32_t length){
         if(rx_read_index >= UART_RX_BUFFER_SIZE) rx_read_index = 0;
     }
 
-    buffer[length] = '\0';
+    buffer[to_copy] = '\0';
     
+    return to_copy;
+}
+
+// TO DELETE
+void uart_test_inject_rx(const uint8_t *data, uint32_t len){
+
+    for(uint32_t i = 0; i < len; i++){
+
+        uint32_t next = rx_write_index + 1;
+        if(next >= UART_RX_BUFFER_SIZE){
+            next = 0;
+        }
+
+        if(next == rx_read_index){
+            rx_overflow = 1;
+            return;                 // Stop, refuse the rest
+        }
+
+        rx_buffer[rx_write_index] = data[i];
+        rx_write_index = next;
+    }
 }
 
 // TX INTERRUPT FUN
