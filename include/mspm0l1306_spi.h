@@ -151,13 +151,6 @@ typedef enum{
      SPI_BIT_ORDER_MSB_FIRST = 1U,
 } spi_bit_order_t;
 
-typedef enum{
-     SPI_CS_LINE_0 = 0U,
-     SPI_CS_LINE_1 = 1U,
-     SPI_CS_LINE_2 = 2U,
-     SPI_CS_LINE_3 = 3U,
-} spi_cs_line_t;
-
 // RSTCTL Macros
 
 #define SPI_RSTCTL_KEY_UNLOCK_W       (0xB1000000U)
@@ -213,7 +206,6 @@ void spi_enable_power              (void);
 void spi_disable_power             (void);
 void spi_set_clock_configuration   (spi_clock_t clock, spi_clock_div_t divider);
 void spi_set_clock_prescaler       (uint32_t scr);
-void spi_set_cs_line               (spi_cs_line_t line);
 void spi_set_mode                  (spi_mode_t mode);
 void spi_set_transfer_mode         (spi_transfer_mode_t transfer_mode);
 void spi_set_frame_format          (spi_frame_format_t frame_format);

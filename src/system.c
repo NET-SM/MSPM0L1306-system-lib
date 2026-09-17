@@ -10,12 +10,12 @@ void SystemCoreClockUpdate();
 
 void SystemInit(SystemClock_t clock)
 {
-    // Validacija
+    // Safety check
     if (clock > CLOCK_32MHZ) {
-        clock = CLOCK_32MHZ;  // Fallback na max
+        clock = CLOCK_32MHZ;
     }
 
-    // Konfigurisanje SYSOSC frekv.
+    // Configuration of SYSOSC freq.
 
     ClockInit(clock);
     SystemCoreClockUpdate(); 

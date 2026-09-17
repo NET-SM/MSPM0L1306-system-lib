@@ -104,10 +104,6 @@ void spi_set_bit_order(spi_bit_order_t order){
     write_reg_bit(&SPI->CTL1, SPI_CTL1_MSB_OFS, order);
 }
 
-void spi_set_cs_line(spi_cs_line_t line){
-    write_reg_field(&SPI->CTL0,  SPI_CTL0_CSSEL_OFS, SPI_CTL0_CSSEL_WIDTH, line);
-}
-
 void spi_cs_enable(uint32_t pin){
     gpio_write(pin, 0);
 }
@@ -124,7 +120,7 @@ uint8_t spi_transfer_byte(uint8_t data){
 
     write_reg_field(&SPI->TXDATA, 0, 8, data);
 
-    // 2. Wait until RX FIFO empties out
+    // 2. Wait until RX FIFO is not empty
     while(read_reg_bit(&SPI->STAT, SPI_STAT_RFE_OFS)== 1) { }
 
     uint8_t received = (uint8_t) read_reg_field(&SPI->RXDATA, 0, 8);

@@ -117,6 +117,131 @@ typedef struct {
     I2C_SLAVE_Regs SLAVE;                   // (@ 0x00001250)
 } I2C_Regs;
 
+#define I2C ((I2C_Regs *) I2C0_BASE)
+
+// CLKDIV enum
+
+typedef enum{
+     I2C_CLKDIV_NO_DIV = 0U,
+     I2C_CLKDIV_2_DIV  = 1U,
+     I2C_CLKDIV_3_DIV  = 2U,
+     I2C_CLKDIV_4_DIV  = 3U,
+     I2C_CLKDIV_5_DIV  = 4U,
+     I2C_CLKDIV_6_DIV  = 5U,
+     I2C_CLKDIV_7_DIV  = 6U,
+     I2C_CLKDIV_8_DIV  = 7U,
+} i2c_clock_div_t;
 
 
+// CLKSEL enum
+
+typedef enum{
+     I2C_CLKSEL_MFCLK  = 2U,
+     I2C_CLKSEL_BUSCLK = 3U,
+} i2c_clock_t;
+
+typedef enum{
+     I2C_DIR_TRANSMIT = 0U,
+     I2C_DIR_RECEIVE  = 1U,
+} i2c_direction_t;
+
+typedef enum{
+     I2C_ADDR_MODE_7BIT  = 0U,
+     I2C_ADDR_MODE_10BIT = 1U,
+} i2c_addr_mode_t;
+
+// RSTCTL Macros
+
+#define I2C_RSTCTL_KEY_UNLOCK_W         (0xB1000000U)
+#define I2C_RSTCTL_RESETASSERT          (1U)
+
+// CLKSEL Macros
+
+#define I2C_CLKSEL_BUSCLK_SEL_OFS       (3U)
+#define I2C_CLKSEL_MFCLK_SEL_OFS        (2U)
+
+// CLKDIV Macros
+
+#define I2C_CLKDIV_RATIO_OFS            (0U)
+#define I2C_CLKDIV_RATIO_WIDTH          (3U)
+
+// CSA Macros
+
+#define I2C_CSA_DIR_OFS                 (0U)
+#define I2C_CSA_TADDR_OFS               (1U)
+#define I2C_CSA_TADDR_WIDTH             (10U)
+#define I2C_CSA_CMODE_OFS               (15U)
+
+// CCTR Macros
+
+#define I2C_CCTR_BURSTRUN_OFS           (0U)
+#define I2C_CCTR_START_OFS              (1U)
+#define I2C_CCTR_STOP_OFS               (2U)
+#define I2C_CCTR_ACK_OFS                (3U)
+#define I2C_CCTR_CACKOEN_OFS            (4U)
+#define I2C_CCTR_RD_ON_TXEMPTY_OFS      (5U)
+#define I2C_CCTR_CBLEN_OFS              (16U)
+#define I2C_CCTR_CBLEN_WIDTH            (12U)
+
+// CSR Macros
+
+#define I2C_CSR_BUSY_OFS                (0U)
+#define I2C_CSR_ERR_OFS                 (1U)
+#define I2C_CSR_ADRACK_OFS              (2U)
+#define I2C_CSR_DATACK_OFS              (3U)
+#define I2C_CSR_ARBLST_OFS              (4U)
+#define I2C_CSR_IDLE_OFS                (5U)
+#define I2C_CSR_BUSBSY_OFS              (6U)
+#define I2C_CSR_CBCNT_OFS               (16U)
+#define I2C_CSR_CBCNT_WIDTH             (12U)
+
+// MRXDATA Macros
+
+#define I2C_MRXDATA_VALUE_OFS           (0U)
+#define I2C_MRXDATA_VALUE_WIDTH         (8U)
+
+// MTXDATA Macros
+
+#define I2C_MTXDATA_VALUE_OFS           (0U)
+#define I2C_MTXDATA_VALUE_WIDTH         (8U)
+
+// CTPR Macros
+
+#define I2C_CTRP_TPR_OFS                (0U)
+#define I2C_CTRP_TPR_WIDTH              (7U)
+
+// CPR Macros
+
+#define I2C_CCR_ACTIVE_OFS              (0U)
+#define I2C_CCR_MCTL_OFS                (1U)
+#define I2C_CCR_CLKSTRETCH_OFS          (2U)
+#define I2C_CCR_LPBK_OFS                (8U)
+
+
+
+//=======================================Configuration Functions==================================
+
+void i2c_reset                               (void);
+void i2c_power_enable                        (void);
+void i2c_power_disable                       (void);
+
+void i2c_enable                              (void);
+void i2c_disable                             (void);
+
+void i2c_set_clock_configuration             (i2c_clock_t clock, i2c_clock_div_t divider);
+void i2c_set_baudrate                        (uint32_t clock_freq, uint32_t target_freq);
+
+void i2c_set_addressing_mode                 (i2c_addr_mode_t addr_mode);
+void i2c_set_target                          (uint32_t address);
+void i2c_set_direction                       (i2c_direction_t direction);
+
+uint8_t i2c_send_byte                        (uint8_t data_addr, uint8_t data, uint8_t send_start, uint8_t send_stop);
+uint8_t temp_func(uint8_t data, uint8_t send_start, uint8_t send_stop);
+uint8_t i2c_receive_byte                     (uint8_t ack, uint8_t send_start, uint8_t send_stop, uint8_t *out);
+
+
+uint8_t i2c_bus_is_busy                      (void);
+uint8_t i2c_is_busy                          (void);
+uint8_t i2c_had_error                        (void);
+uint8_t i2c_address_acked                    (void);
 #endif //MSPM0L1306_I2C_H
