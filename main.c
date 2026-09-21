@@ -25,35 +25,25 @@ int main(void) {
 
     i2c_enable();
 
-    
-    
-    //uint8_t lb_write = i2c_write_byte(0x50, 0xAB, 1, 1);
-    //uint8_t lb_err1  = i2c_had_error();
-    //uint8_t lb_adack1= i2c_address_acked();
-    //uint8_t lb_read  = i2c_read_byte(0x50, 0, 1, 1);
-    //uint8_t lb_err2  = i2c_had_error();
-    //uint8_t lb_adack2= i2c_address_acked();
-
-
     uint8_t word_addr = 0x10;
     uint8_t write_val = 0x77;
 
-    
-    i2c_set_target(EEPROM_ADDR);
-    
-    i2c_send_byte(word_addr, write_val, 1, 1);
-    delay_ms(6);
+    uint8_t data[4] = {0x11, 0x22, 0x33, 0x44};
+    uint8_t got_data[4];
     uint8_t result;
-    temp_func(word_addr, ENABLE, ENABLE);
-    i2c_receive_byte(0, ENABLE, ENABLE, &result);
-    
 
-    //i2c_set_target(EEPROM_ADDR, I2C_DIR_TRANSMIT);
-    //i2c_send_byte(word_addr, 1, 0);
-    //i2c_set_target(EEPROM_ADDR, I2C_DIR_RECEIVE);
+    i2c_set_target(EEPROM_ADDR);
+    i2c_write_buffer(word_addr, &write_val, 1);
+    delay_ms(10);
+    i2c_read_buffer(word_addr, &result, 1);
+
+
+    //i2c_send_byte(word_addr, write_val, 1, 1);
+    //delay_ms(6);
     //uint8_t result;
+    //set_start_addr(word_addr, ENABLE, ENABLE);
     //i2c_receive_byte(0, ENABLE, ENABLE, &result);
-
+    
     while (1) {
         
     }

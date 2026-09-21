@@ -123,22 +123,6 @@ uint8_t i2c_send_byte(uint8_t data_addr, uint8_t data, uint8_t send_start, uint8
 
 }
 
-uint8_t temp_func(uint8_t data, uint8_t send_start, uint8_t send_stop){
-
-    i2c_set_direction(I2C_DIR_TRANSMIT);
-    i2c_send_controller_tx(data);
-    i2c_trigger_transaction(1, 0, send_stop, send_start);
-
-    while(i2c_is_busy()) { }
-
-    if(i2c_had_error()){
-        return 0;
-    }
-
-    return 1;
-
-}
-
 uint8_t i2c_receive_byte(uint8_t ack, uint8_t send_start, uint8_t send_stop, uint8_t *out){
 
     i2c_set_direction(I2C_DIR_RECEIVE);
@@ -168,4 +152,55 @@ void i2c_enable(void){
 }
 void i2c_disable(void){
     write_reg_bit(&I2C->MASTER.MCR, I2C_CCR_ACTIVE_OFS, DISABLE);
+}
+
+uint8_t i2c_write_buffer(uint8_t mem_addr, const uint8_t *data, uint32_t length){
+
+    i2c_set_direction(I2C_DIR_TRANSMIT);
+    
+    while(read_reg_field(&I2C->MASTER.MFIFOSR, I2C_CFIFOSR_TXFIFOCNT_OFS, I2C_CFIFOSR_TXFIFOCNT_WIDTH) == 0) { }
+    i2c_send_controller_tx(mem_addr);
+
+    for(uint32_t i = 0; i < length ; i++){
+        while(read_reg_field(&I2C->MASTER.MFIFOSR, I2C_CFIFOSR_TXFIFOCNT_OFS, I2C_CFIFOSR_TXFIFOCNT_WIDTH) == 0) { }
+        i2c_send_controller_tx(data[i]);
+    }
+
+    i2c_trigger_transaction(length + 1, 0, 1, 1);
+    
+    while(i2c_is_busy()){ }
+
+    return !i2c_had_error();
+
+}
+
+uint8_t i2c_read_buffer(uint8_t mem_addr, uint8_t *data, uint32_t length){
+
+    i2c_set_direction(I2C_DIR_TRANSMIT);
+
+    while(read_reg_field(&I2C->MASTER.MFIFOSR, I2C_CFIFOSR_TXFIFOCNT_OFS, I2C_CFIFOSR_TXFIFOCNT_WIDTH) == 0) { }
+    i2c_send_controller_tx(mem_addr);
+
+    i2c_trigger_transaction(1, 0, 1, 1);
+
+    while(i2c_is_busy()) { }
+
+    if(i2c_is_busy()) { }
+
+    if(i2c_had_error()) {
+        return 0;
+    }
+
+
+    i2c_set_direction(I2C_DIR_RECEIVE);
+    i2c_trigger_transaction(length, 0, 1, 1);
+
+    for(uint32_t i = 0; i < length; i++){
+        while(read_reg_field(&I2C->MASTER.MFIFOSR, I2C_CFIFOSR_RXFIFOCNT_OFS, I2C_CFIFOSR_RXFIFOCNT_WIDTH) == 0) { }
+        data[i] = i2c_read_data();
+    }
+
+    while(i2c_is_busy()){ }
+
+    return !i2c_had_error();
 }
