@@ -1,49 +1,35 @@
 #include "system.h"
 
-#define EEPROM_ADDR 0x50
-
-
 int main(void) {
 
-    // I2C IOMUX Config
-    iomux_configure_pin(IOMUX_PINCM1, IOMUX_PINCM1_PF_I2C0_SDA, ENABLE, IOMUX_PULL_UP);
-    iomux_configure_pin(IOMUX_PINCM2, IOMUX_PINCM2_PF_I2C0_SCL, ENABLE, IOMUX_PULL_UP); 
-    iomux_configure_pin(IOMUX_PINCM25, IOMUX_PINCM25_PF_GPIOA_DIO24, ENABLE, IOMUX_PULL_NONE);
-
-    // Setting up GPIO for WP
-    gpio_enable_power();
-    gpio_enable_output(PA24);
-    gpio_write(PA24, 0); // Set to low
-
-    i2c_reset();
-    i2c_power_enable();
-
-    i2c_set_clock_configuration(I2C_CLKSEL_BUSCLK, I2C_CLKDIV_NO_DIV);
-    i2c_set_baudrate(32000000, 100000); // 32MHz; 100kbps
+    iomux_configure_pin(IOMUX_PINCM13, IOMUX_PINCM13_PF_TIMG0_CCP0, DISABLE, IOMUX_PULL_NONE);
     
-    i2c_set_addressing_mode(I2C_ADDR_MODE_7BIT);
-
-    i2c_enable();
-
-    uint8_t word_addr = 0x10;
-    uint8_t write_val = 0x77;
-
-    uint8_t data[4] = {0x11, 0x22, 0x33, 0x44};
-    uint8_t got_data[4];
-    uint8_t result;
-
-    i2c_set_target(EEPROM_ADDR);
-    i2c_write_buffer(word_addr, &write_val, 1);
-    delay_ms(10);
-    i2c_read_buffer(word_addr, &result, 1);
-
-
-    //i2c_send_byte(word_addr, write_val, 1, 1);
-    //delay_ms(6);
-    //uint8_t result;
-    //set_start_addr(word_addr, ENABLE, ENABLE);
-    //i2c_receive_byte(0, ENABLE, ENABLE, &result);
+    pwm_reset();
+    pwm_power_enable();
     
+    pwm_set_clock_configuration(GPTimer_CLKSEL_BUSCLK, GPTimer_CLKDIV_NO_DIV);
+
+
+    pwm_set_count_mode(GPTimer_CM_UP);
+    pwm_set_up_clc_cac_czc();
+    pwm_set_cvae(GPTimer_ZERO_VALUE);
+    pwm_set_repeat_mode(GPTimer_REPEAT_CONTINUE);
+
+    pwm_set_load((uint16_t) 0xFFFF);
+    pwm_set_duty((uint16_t) 0x3FFF);
+    pwm_set_coc_mode(GPTimer_COC_MODE_COMPARE);
+
+    pwm_set_action_on_zero(GPTimer_ACTION_SET_HIGH);
+    pwm_set_action_on_compare_up(GPTimer_ACTION_SET_LOW);
+
+    pwm_set_direction(GPTimer_CCPD_DIR_OUTPUT);
+
+    pwm_set_output_source(GPTimer_CCPO_SIGNAL_GEN);
+    pwm_set_output_invert(0);
+    pwm_set_disabled_state(0);
+    pwm_output_enable();
+
+    pwm_enable();
     while (1) {
         
     }

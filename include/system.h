@@ -12,6 +12,8 @@
 #include "mspm0l1306_uart.h"
 #include "mspm0l1306_spi.h"
 #include "mspm0l1306_i2c.h"
+#include "mspm0l1306_gptimer.h"
+#include "mspm0l1306_pwm.h"
 
 typedef enum {
     CLOCK_4MHZ = 4,

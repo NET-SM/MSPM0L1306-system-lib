@@ -241,7 +241,6 @@ void i2c_set_target                          (uint32_t address);
 void i2c_set_direction                       (i2c_direction_t direction);
 
 uint8_t i2c_send_byte                        (uint8_t data_addr, uint8_t data, uint8_t send_start, uint8_t send_stop);
-uint8_t set_start_addr                       (uint8_t data, uint8_t send_start, uint8_t send_stop);
 uint8_t i2c_receive_byte                     (uint8_t ack, uint8_t send_start, uint8_t send_stop, uint8_t *out);
 uint8_t i2c_read_buffer                      (uint8_t mem_addr, uint8_t *data, uint32_t length);
 uint8_t i2c_write_buffer                     (uint8_t mem_addr, const uint8_t *data, uint32_t length);
