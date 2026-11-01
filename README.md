@@ -46,15 +46,15 @@ cmake -S . -B build -G Ninja
 cmake --build build
 ```
 
-Output(firmware.elf, firmware.bin, firmware.hex) is generated in the build/ directory.
+Output (`firmware.elf`, `firmware.bin`, `firmware.hex`) is generated in the `build/` directory.
 
-The toolchain file is picked up automatically. Any generator that works with arm-none-eabi-gcc can be used instead of Ninja.
+The toolchain file is picked up automatically. Any generator that works with `arm-none-eabi-gcc` can be used instead of Ninja.
 
 Note: build commands were not verified on Windows.
 
 ### Running the examples
 
-Only startup.c, main.c and src/*.c are compiled. To run an example from examples/, copy its contents into main.c.
+Only `startup.c`, `main.c` and `src/*.c` are compiled. To run an example from `examples/`, copy its contents into `main.c`.
 
 ## Known issues
 
