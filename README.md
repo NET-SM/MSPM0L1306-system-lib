@@ -18,3 +18,16 @@ Bare-metal system library for TI MSPML1306 (Arm Cortex-M0+). All register-level 
 |PWM     | polling       |  ✅                     |
 
 ## Project Structure
+
+## Project Structure
+```
+├───core/        # Cortex-M0+ core-specific code
+├───include/     # Header files, one per driver
+├───linker/      # Linker script
+├───src/         # Driver implementation, one .c file per driver
+├───examples/    # Usage examples for each driver
+├───startup.c    # Vector table and Reset_Hanlder
+├───main.c       # Application entry point
+├───CMakeList.txt
+└───toolchain-arm-none-eabi.cmake
+```
